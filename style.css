@@ -1,0 +1,1780 @@
+/* ==========================================================================
+  SPACE INVADERS — MULTI-THEME LANDING PAGE
+  style.css — Production-grade CSS with three complete visual themes
+  Architecture: CSS Custom Properties (variables) + data-theme attribute
+   ========================================================================== */
+
+
+/* ==========================================================================
+  1. CSS CUSTOM PROPERTIES — THEME SYSTEM
+  Each [data-theme] block overrides the root variables below.
+  All components consume ONLY these variables — zero hardcoded colors.
+   ========================================================================== */
+
+:root {
+  /* ── Base ── */
+  --clr-bg:          #000000;
+  --clr-surface:     #0a0a0a;
+  --clr-surface-alt: #111111;
+  --clr-border:      #22ff22;
+  --clr-primary:     #00ff00;
+  --clr-accent:      #ffffff;
+  --clr-text:        #00ff00;
+  --clr-text-muted:  #006600;
+  --clr-text-inverse:#000000;
+
+  /* ── Typography ── */
+  --font-display:   'Press Start 2P', monospace;
+  --font-body:      'Press Start 2P', monospace;
+  --font-size-hero: clamp(2rem, 8vw, 5.5rem);
+  --font-size-h2:   clamp(1.2rem, 4vw, 2.5rem);
+  --font-size-body: clamp(0.5rem, 1.5vw, 0.7rem);
+
+  /* ── Spacing ── */
+  --space-xs:  0.5rem;
+  --space-sm:  1rem;
+  --space-md:  2rem;
+  --space-lg:  4rem;
+  --space-xl:  8rem;
+
+  /* ── Effects ── */
+  --glow-primary:   0 0 10px var(--clr-primary), 0 0 30px var(--clr-primary), 0 0 60px var(--clr-primary);
+  --glow-accent:    0 0 10px var(--clr-accent),  0 0 20px var(--clr-accent);
+  --shadow-card:    0 4px 30px rgba(0, 255, 0, 0.2);
+  --radius-card:    0px;
+  --radius-btn:     0px;
+
+  /* ── Transitions ── */
+  --transition-fast:   0.15s ease;
+  --transition-normal: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:   0.7s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Card / Glass ── */
+  --glass-bg:     rgba(0, 20, 0, 0.8);
+  --glass-border: 2px solid var(--clr-border);
+  --glass-blur:   0px;
+}
+
+/* ──────────────────────────────────────────────
+  RETRO ARCADE THEME (default)
+  Pixel art aesthetic — green on black — CRT feel
+   ────────────────────────────────────────────── */
+[data-theme="retro"] {
+  --clr-bg:          #000000;
+  --clr-surface:     #020b02;
+  --clr-surface-alt: #001100;
+  --clr-border:      #00cc00;
+  --clr-primary:     #00ff00;
+  --clr-accent:      #ffff00;
+  --clr-text:        #00ee00;
+  --clr-text-muted:  #005500;
+  --clr-text-inverse:#000000;
+
+  --font-display:    'Press Start 2P', monospace;
+  --font-body:       'Press Start 2P', monospace;
+
+  --glow-primary:   0 0 8px #00ff00, 0 0 20px #00ff00, 0 0 40px #00cc00;
+  --shadow-card:    0 0 0 2px #00cc00, 0 0 20px rgba(0,255,0,0.15);
+  --radius-card:    0px;
+  --radius-btn:     0px;
+  --glass-bg:       rgba(0, 20, 0, 0.9);
+  --glass-border:   2px solid #00cc00;
+  --glass-blur:     0px;
+}
+
+/* ──────────────────────────────────────────────
+3D FUTURISTIC THEME
+Glassmorphism — neon cyan — depth and glow
+   ────────────────────────────────────────────── */
+[data-theme="futuristic"] {
+  --clr-bg:          #030b18;
+  --clr-surface:     #061428;
+  --clr-surface-alt: #0a2040;
+  --clr-border:      #00d4ff;
+  --clr-primary:     #00e5ff;
+  --clr-accent:      #7b2fff;
+  --clr-text:        #e0f4ff;
+  --clr-text-muted:  #5a8fa8;
+  --clr-text-inverse:#030b18;
+
+  --font-display:    'Orbitron', sans-serif;
+  --font-body:       'Orbitron', sans-serif;
+
+  --glow-primary:   0 0 12px #00e5ff, 0 0 35px #00e5ff, 0 0 80px #007bff;
+  --shadow-card:    0 8px 40px rgba(0, 180, 255, 0.2), 0 0 0 1px rgba(0, 220, 255, 0.2);
+  --radius-card:    12px;
+  --radius-btn:     6px;
+  --glass-bg:       rgba(3, 20, 50, 0.45);
+  --glass-border:   1px solid rgba(0, 220, 255, 0.3);
+  --glass-blur:     16px;
+}
+
+/* ──────────────────────────────────────────────
+ANIME CYBERPUNK THEME
+Vibrant pink/purple — gradients — soft glow
+   ────────────────────────────────────────────── */
+[data-theme="anime"] {
+  --clr-bg:          #0d001a;
+  --clr-surface:     #160024;
+  --clr-surface-alt: #200030;
+  --clr-border:      #ff2dca;
+  --clr-primary:     #ff2dca;
+  --clr-accent:      #7a00ff;
+  --clr-text:        #f0d0ff;
+  --clr-text-muted:  #8060a0;
+  --clr-text-inverse:#0d001a;
+
+  --font-display:    'Rajdhani', sans-serif;
+  --font-body:       'Rajdhani', sans-serif;
+
+  --glow-primary:   0 0 15px #ff2dca, 0 0 40px #ff2dca, 0 0 80px #b800ff;
+  --shadow-card:    0 8px 40px rgba(255, 45, 202, 0.2), 0 0 0 1px rgba(255, 45, 202, 0.3);
+  --radius-card:    18px;
+  --radius-btn:     50px;
+  --glass-bg:       rgba(30, 0, 50, 0.5);
+  --glass-border:   1px solid rgba(255, 45, 202, 0.35);
+  --glass-blur:     20px;
+}
+
+
+/* ==========================================================================
+2. GLOBAL RESETS & BASE
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  background-color: var(--clr-bg);
+  color: var(--clr-text);
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  line-height: 1.8;
+  overflow-x: hidden;
+  /* Smooth theme transition on body-level properties */
+  transition:
+    background-color var(--transition-slow),
+    color var(--transition-slow);
+}
+
+/* All elements inherit smooth color transitions during theme change */
+body.theme-transitioning *,
+body.theme-transitioning {
+  transition:
+    background-color var(--transition-slow),
+    color var(--transition-slow),
+    border-color var(--transition-slow),
+    box-shadow var(--transition-slow),
+    text-shadow var(--transition-slow),
+    filter var(--transition-slow) !important;
+}
+
+/* Typography resets */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.2;
+  color: var(--clr-text);
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+a {
+  color: var(--clr-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast), opacity var(--transition-fast);
+}
+a:hover { opacity: 0.8; }
+a:focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+ul { list-style: none; }
+
+/* Container utility */
+.section-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+  width: 100%;
+}
+.section-inner--centered {
+  text-align: center;
+}
+
+
+/* ==========================================================================
+3. CANVAS BACKGROUND
+   ========================================================================== */
+
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  /* The canvas renders differently per theme (controlled in JS) */
+}
+
+
+/* ==========================================================================
+4. CRT SCANLINE OVERLAY (Retro theme only)
+   ========================================================================== */
+
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  /* Repeating gradient creates scanline illusion */
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.25) 2px,
+    rgba(0, 0, 0, 0.25) 4px
+  );
+  opacity: 0;
+  transition: opacity var(--transition-slow);
+}
+
+/* Flicker keyframes for CRT authenticity */
+@keyframes crt-flicker {
+  0%   { opacity: 0.85; }
+  92%  { opacity: 0.85; }
+  93%  { opacity: 0.75; }
+  94%  { opacity: 0.85; }
+  100% { opacity: 0.85; }
+}
+
+[data-theme="retro"] .scanlines {
+  opacity: 1;
+  animation: crt-flicker 4s infinite;
+}
+
+
+/* ==========================================================================
+5. THEME TRANSITION VEIL
+Full-screen flash used during theme switching
+   ========================================================================== */
+
+.theme-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--clr-primary);
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: opacity 0.2s ease;
+}
+.theme-veil.flash {
+  opacity: 0.6;
+}
+
+
+/* ==========================================================================
+  6. NAVIGATION
+   ========================================================================== */
+
+.site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--glass-bg);
+  border-bottom: var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  transition:
+    background var(--transition-slow),
+    border-color var(--transition-slow),
+    backdrop-filter var(--transition-slow);
+}
+
+.nav-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+  height: 70px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+/* Logo */
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.nav-logo-svg {
+  width: 32px;
+  height: 24px;
+  color: var(--clr-primary);
+  filter: drop-shadow(0 0 6px currentColor);
+  transition: color var(--transition-slow), filter var(--transition-slow);
+}
+.nav-logo-text {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  color: var(--clr-primary);
+  text-shadow: var(--glow-primary);
+  letter-spacing: 0.05em;
+  transition:
+    color var(--transition-slow),
+    text-shadow var(--transition-slow),
+    font-family 0s;
+  white-space: nowrap;
+}
+
+/* Nav links */
+.nav-links {
+  display: flex;
+  gap: var(--space-md);
+  margin-left: auto;
+}
+.nav-links a {
+  font-family: var(--font-display);
+  font-size: 0.5rem;
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition:
+    color var(--transition-fast),
+    text-shadow var(--transition-fast);
+}
+.nav-links a:hover {
+  color: var(--clr-primary);
+  text-shadow: var(--glow-primary);
+  opacity: 1;
+}
+
+/* Theme switcher */
+.theme-switcher {
+  display: flex;
+  gap: 4px;
+  background: rgba(0,0,0,0.3);
+  padding: 4px;
+  border-radius: var(--radius-card);
+  border: var(--glass-border);
+  flex-shrink: 0;
+  transition: border-color var(--transition-slow), border-radius var(--transition-slow);
+}
+
+.theme-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius-btn) / 2);
+  cursor: pointer;
+  color: var(--clr-text-muted);
+  font-family: var(--font-display);
+  font-size: 0.45rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    border-radius var(--transition-slow);
+}
+.theme-btn:hover {
+  color: var(--clr-text);
+  background: rgba(255,255,255,0.05);
+}
+.theme-btn.active {
+  background: var(--clr-primary);
+  color: var(--clr-text-inverse);
+  border-color: var(--clr-primary);
+  box-shadow: var(--glow-primary);
+}
+.theme-btn-icon { font-size: 1rem; line-height: 1; }
+.theme-btn-label { display: none; }
+@media (min-width: 900px) {
+  .theme-btn-label { display: block; }
+}
+
+/* Mobile menu toggle */
+.nav-menu-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  margin-left: auto;
+}
+.nav-menu-toggle span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--clr-primary);
+  transition: background var(--transition-slow);
+}
+
+/* Mobile menu */
+.mobile-menu {
+  display: none;
+  padding: var(--space-sm) var(--space-md);
+  border-top: var(--glass-border);
+  background: var(--glass-bg);
+}
+.mobile-menu ul { display: flex; flex-direction: column; gap: var(--space-xs); }
+.mobile-menu a {
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  color: var(--clr-text);
+  padding: var(--space-xs) 0;
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-menu-toggle { display: flex; }
+  .mobile-menu.open { display: block; }
+  .theme-btn-label { display: none; }
+  .nav-logo-text { display: none; }
+}
+
+
+/* ==========================================================================
+  7. HERO SECTION
+   ========================================================================== */
+
+.hero {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: calc(70px + var(--space-lg)) var(--space-md) var(--space-xl);
+  overflow: hidden;
+}
+
+.hero-inner {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+/* Floating alien formation */
+.hero-aliens {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.alien {
+  width: 80px;
+  color: var(--clr-primary);
+  filter: drop-shadow(0 0 8px currentColor);
+  transition: color var(--transition-slow), filter var(--transition-slow);
+  animation: alien-float 3s ease-in-out infinite;
+}
+.alien-squid  { animation-delay: 0s;   animation-duration: 2.8s; }
+.alien-crab   { animation-delay: 0.4s; animation-duration: 3.2s; }
+.alien-octopus{ animation-delay: 0.8s; animation-duration: 2.6s; }
+
+@keyframes alien-float {
+  0%, 100% { transform: translateY(0px);  }
+  50%       { transform: translateY(-12px); }
+}
+
+/* Anime theme: aliens get extra color variation */
+[data-theme="anime"] .alien-squid   { color: #ff2dca; }
+[data-theme="anime"] .alien-crab    { color: #7a00ff; }
+[data-theme="anime"] .alien-octopus { color: #00e5ff; }
+
+/* Hero content */
+.hero-content {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.hero-kicker {
+  font-family: var(--font-display);
+  font-size: 0.5rem;
+  color: var(--clr-accent);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  /* Blinking cursor effect in retro */
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+[data-theme="retro"] .hero-kicker {
+  animation: blink-text 1s step-end infinite;
+}
+
+@keyframes blink-text {
+  0%, 100% { opacity: 0.8; }
+  50%       { opacity: 0; }
+}
+
+/* Hero title */
+.hero-title {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-display);
+  font-size: var(--font-size-hero);
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  transition: font-family 0s;
+}
+
+.hero-title-line {
+  display: block;
+  color: var(--clr-text);
+  transition: color var(--transition-slow);
+}
+
+.hero-title-accent {
+  color: var(--clr-primary);
+  text-shadow: var(--glow-primary);
+  transition:
+    color var(--transition-slow),
+    text-shadow var(--transition-slow);
+}
+
+/* Anime: gradient text on accent */
+[data-theme="anime"] .hero-title-accent {
+  background: linear-gradient(135deg, #ff2dca, #7a00ff, #00e5ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  animation: gradient-shift 4s ease infinite;
+  background-size: 200% 200%;
+}
+
+/* Futuristic: gradient text */
+[data-theme="futuristic"] .hero-title-accent {
+  background: linear-gradient(135deg, #00e5ff, #7b2fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+}
+
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.hero-subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(0.45rem, 1.2vw, 0.65rem);
+  color: var(--clr-text-muted);
+  max-width: 480px;
+  line-height: 2;
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+/* Score row */
+.hero-score-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  font-family: var(--font-display);
+  font-size: 0.45rem;
+  color: var(--clr-text-muted);
+  transition: color var(--transition-slow), font-family 0s;
+}
+.score-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--clr-text-muted);
+  padding: 4px 10px;
+  border-radius: var(--radius-btn);
+  transition: border-color var(--transition-slow), border-radius var(--transition-slow);
+}
+.score-icon { font-size: 1rem; }
+
+/* CTA buttons row */
+.hero-cta-row {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  margin-top: var(--space-xs);
+}
+
+/* Hero ship */
+.hero-ship-wrap {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 10%;
+}
+.hero-ship {
+  width: 120px;
+  color: var(--clr-primary);
+  filter: drop-shadow(0 0 10px currentColor);
+  animation: ship-hover 2s ease-in-out infinite;
+  transition: color var(--transition-slow), filter var(--transition-slow);
+}
+@keyframes ship-hover {
+  0%, 100% { transform: translateX(0); }
+  50%       { transform: translateX(20px); }
+}
+
+.laser-beam {
+  animation: laser-pulse 0.5s ease-in-out infinite;
+}
+@keyframes laser-pulse {
+  0%, 100% { opacity: 1; transform: scaleY(1); }
+  50%       { opacity: 0.3; transform: scaleY(0.5); transform-origin: bottom; }
+}
+
+/* Scroll hint */
+.hero-scroll-hint {
+  position: absolute;
+  bottom: var(--space-md);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.5;
+}
+.scroll-label {
+  font-family: var(--font-display);
+  font-size: 0.4rem;
+  color: var(--clr-text-muted);
+  letter-spacing: 0.15em;
+  transition: color var(--transition-slow), font-family 0s;
+}
+.scroll-arrow {
+  width: 12px;
+  height: 12px;
+  border-right: 2px solid var(--clr-text-muted);
+  border-bottom: 2px solid var(--clr-text-muted);
+  transform: rotate(45deg);
+  animation: bounce-arrow 1.5s ease-in-out infinite;
+  transition: border-color var(--transition-slow);
+}
+@keyframes bounce-arrow {
+  0%, 100% { transform: rotate(45deg) translateY(0); }
+  50%       { transform: rotate(45deg) translateY(5px); }
+}
+
+/* Responsive hero */
+@media (max-width: 768px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .hero-aliens { grid-column: 1; grid-row: 1; flex-direction: row; }
+  .hero-content { grid-column: 1; grid-row: 2; align-items: center; }
+  .hero-ship-wrap { justify-content: center; padding-right: 0; }
+  .hero-cta-row { justify-content: center; }
+  .hero-score-row { justify-content: center; }
+  .hero-subtitle { text-align: center; margin: 0 auto; }
+}
+
+
+/* ==========================================================================
+  8. BUTTONS
+   ========================================================================== */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 2px solid var(--clr-primary);
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    background var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast),
+    border-color var(--transition-slow),
+    border-radius var(--transition-slow),
+    font-family 0s;
+}
+
+.btn-primary {
+  background: var(--clr-primary);
+  color: var(--clr-text-inverse);
+  box-shadow: var(--glow-primary);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-primary), 0 8px 24px rgba(0,0,0,0.4);
+  opacity: 1;
+}
+.btn-primary:active { transform: translateY(0); }
+
+/* Animated glow orb inside primary button */
+.btn-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.3), transparent 70%);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  border-radius: inherit;
+}
+.btn-primary:hover .btn-glow { opacity: 1; }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--clr-primary);
+  box-shadow: none;
+}
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 0 0 1px var(--clr-primary);
+  transform: translateY(-2px);
+  opacity: 1;
+}
+
+.btn-large {
+  padding: 18px 40px;
+  font-size: 0.65rem;
+}
+
+/* Futuristic: 3D perspective hover on buttons */
+[data-theme="futuristic"] .btn:hover {
+  transform: translateY(-3px) perspective(200px) rotateX(5deg);
+}
+/* Anime: pill shape, gradient glow */
+[data-theme="anime"] .btn-primary {
+  background: linear-gradient(135deg, #ff2dca, #7a00ff);
+  border-color: transparent;
+}
+[data-theme="anime"] .btn-secondary {
+  border-image: linear-gradient(135deg, #ff2dca, #7a00ff) 1;
+}
+
+
+/* ==========================================================================
+  9. GLASS CARD
+  Reusable glassmorphism component consumed across all card types
+   ========================================================================== */
+
+.glass-card {
+  background: var(--glass-bg);
+  border: var(--glass-border);
+  border-radius: var(--radius-card);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--shadow-card);
+  padding: var(--space-md);
+  transition:
+    background var(--transition-slow),
+    border var(--transition-slow),
+    border-radius var(--transition-slow),
+    box-shadow var(--transition-slow),
+    backdrop-filter var(--transition-slow),
+    transform var(--transition-normal);
+}
+
+/* Futuristic: deep 3D perspective tilt on hover */
+[data-theme="futuristic"] .glass-card {
+  transform-style: preserve-3d;
+}
+[data-theme="futuristic"] .glass-card:hover {
+  transform: perspective(800px) rotateY(-4deg) rotateX(3deg) translateY(-6px);
+  box-shadow: 0 20px 60px rgba(0, 220, 255, 0.3), 0 0 0 1px rgba(0, 220, 255, 0.4);
+}
+
+/* Anime: float on hover with glow */
+[data-theme="anime"] .glass-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 60px rgba(255, 45, 202, 0.35), 0 0 0 1px rgba(255, 45, 202, 0.4);
+}
+
+/* Retro: shift text glow */
+[data-theme="retro"] .glass-card:hover {
+  box-shadow: 0 0 0 2px #00ff00, 0 0 30px rgba(0,255,0,0.25);
+}
+
+
+/* ==========================================================================
+  10. SECTIONS — Shared Layout
+   ========================================================================== */
+
+.section {
+  position: relative;
+  z-index: 2;
+  padding: var(--space-xl) var(--space-md);
+}
+
+/* Alternating section backgrounds */
+.section-story   { background: transparent; }
+.section-gameplay{ background: var(--glass-bg); border-top: var(--glass-border); border-bottom: var(--glass-border); }
+.section-aliens  { background: transparent; }
+.section-legacy  { background: var(--glass-bg); border-top: var(--glass-border); border-bottom: var(--glass-border); }
+.section-cta     { background: transparent; padding-bottom: calc(var(--space-xl) + var(--space-lg)); }
+
+.section-label {
+  font-family: var(--font-display);
+  font-size: 0.45rem;
+  color: var(--clr-text-muted);
+  letter-spacing: 0.2em;
+  margin-bottom: var(--space-xs);
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h2);
+  color: var(--clr-text);
+  margin-bottom: var(--space-lg);
+  text-transform: uppercase;
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+/* Accent underline on section titles */
+.section-title::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: var(--clr-primary);
+  margin-top: var(--space-xs);
+  box-shadow: var(--glow-primary);
+  transition: background var(--transition-slow), box-shadow var(--transition-slow);
+}
+
+.section-subtitle {
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  color: var(--clr-text-muted);
+  max-width: 560px;
+  line-height: 2;
+  margin-bottom: var(--space-lg);
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+
+/* ==========================================================================
+  11. STORY SECTION
+   ========================================================================== */
+
+.story-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-md);
+}
+
+.story-card { display: flex; flex-direction: column; gap: var(--space-xs); }
+
+.card-year {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  color: var(--clr-primary);
+  text-shadow: var(--glow-primary);
+  line-height: 1;
+  transition: color var(--transition-slow), text-shadow var(--transition-slow), font-family 0s;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: var(--clr-text);
+  margin: var(--space-xs) 0 0;
+  text-transform: uppercase;
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+.card-body {
+  font-family: var(--font-body);
+  font-size: 0.5rem;
+  color: var(--clr-text-muted);
+  line-height: 2.2;
+  transition: color var(--transition-slow), font-family 0s;
+}
+.card-body em { color: var(--clr-primary); font-style: normal; }
+
+
+/* ==========================================================================
+  12. GAMEPLAY SECTION
+   ========================================================================== */
+
+.gameplay-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: var(--space-lg);
+  align-items: center;
+}
+
+/* Screen bezel mockup */
+.gameplay-screen { display: flex; justify-content: center; }
+
+.screen-bezel {
+  width: clamp(240px, 30vw, 360px);
+  aspect-ratio: 3 / 4;
+  background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  box-shadow: 0 0 0 4px var(--clr-border), 0 20px 60px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.1);
+  transition: border-color var(--transition-slow), border-radius var(--transition-slow), box-shadow var(--transition-slow);
+}
+
+.screen-face {
+  width: 100%;
+  height: 100%;
+  background: #020802;
+  border-radius: calc(var(--radius-card) / 2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  position: relative;
+  border: 1px solid #003300;
+  transition: border-color var(--transition-slow), border-radius var(--transition-slow);
+}
+
+[data-theme="futuristic"] .screen-face { background: #010d1e; border-color: #003355; }
+[data-theme="anime"]      .screen-face { background: #0d0015; border-color: #330033; }
+
+.screen-hud {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.35rem;
+  color: var(--clr-primary);
+  text-shadow: 0 0 6px currentColor;
+  padding-bottom: 8px;
+  border-bottom: 1px solid currentColor;
+  line-height: 1.6;
+  transition: color var(--transition-slow);
+}
+.screen-hud strong { display: block; margin-top: 2px; }
+
+/* Mini alien grid inside screen */
+.mini-alien-grid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 8px 0;
+  align-items: center;
+}
+
+/* Generated by JS — see script.js */
+.mini-alien-row {
+  display: flex;
+  gap: 8px;
+  animation: mini-march 1.5s ease-in-out infinite alternate;
+}
+@keyframes mini-march {
+  from { transform: translateX(-12px); }
+  to   { transform: translateX(12px); }
+}
+.mini-alien-row:nth-child(even) { animation-delay: 0.15s; }
+
+.mini-alien-cell {
+  width: 12px;
+  height: 10px;
+  background: var(--clr-primary);
+  box-shadow: 0 0 6px var(--clr-primary);
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  transition: background var(--transition-slow), box-shadow var(--transition-slow);
+}
+
+/* Shields */
+.mini-shields {
+  display: flex;
+  justify-content: space-around;
+  padding: 4px 0;
+}
+.mini-shield {
+  width: 20px;
+  height: 14px;
+  background: var(--clr-primary);
+  box-shadow: 0 0 6px currentColor;
+  clip-path: polygon(10% 0%, 90% 0%, 100% 40%, 100% 100%, 80% 100%, 80% 60%, 20% 60%, 20% 100%, 0 100%, 0 40%);
+  transition: background var(--transition-slow);
+}
+
+/* Player ship at bottom of screen */
+.mini-player {
+  display: flex;
+  justify-content: center;
+  padding-top: 6px;
+}
+.mini-player svg {
+  width: 30px;
+  color: var(--clr-primary);
+  filter: drop-shadow(0 0 5px currentColor);
+  transition: color var(--transition-slow);
+}
+
+/* Mechanics list */
+.mechanics-list { display: flex; flex-direction: column; gap: var(--space-sm); }
+
+.mechanic-item {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+}
+.mechanic-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.mechanic-content h3 {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  color: var(--clr-text);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  transition: color var(--transition-slow), font-family 0s;
+}
+.mechanic-content p {
+  font-size: 0.5rem;
+  color: var(--clr-text-muted);
+  line-height: 2;
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+@media (max-width: 900px) {
+  .gameplay-layout { grid-template-columns: 1fr; }
+  .gameplay-screen { order: -1; }
+}
+
+
+/* ==========================================================================
+  13. ALIENS SHOWCASE
+   ========================================================================== */
+
+.aliens-showcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-md);
+}
+
+.alien-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg) var(--space-md);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Point value badge */
+.alien-card::before {
+  content: attr(data-points) ' PTS';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.4rem;
+  color: var(--clr-accent);
+  opacity: 0.6;
+  letter-spacing: 0.05em;
+}
+
+.alien-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-sm);
+}
+.alien-big {
+  width: clamp(60px, 10vw, 100px);
+  color: var(--clr-primary);
+  filter: drop-shadow(0 0 10px currentColor);
+  transition: color var(--transition-slow), filter var(--transition-slow), transform var(--transition-normal);
+  animation: alien-float 3s ease-in-out infinite;
+}
+.alien-card:hover .alien-big {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 20px currentColor);
+}
+
+.alien-name {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: var(--clr-text);
+  text-transform: uppercase;
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+.alien-points {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  color: var(--clr-primary);
+  text-shadow: var(--glow-primary);
+  transition: color var(--transition-slow), text-shadow var(--transition-slow), font-family 0s;
+}
+
+.alien-desc {
+  font-size: 0.5rem;
+  color: var(--clr-text-muted);
+  line-height: 2;
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+/* Anime: per-alien color differentiation */
+[data-theme="anime"] .alien-card:nth-child(1) .alien-big { color: #ffcc00; }
+[data-theme="anime"] .alien-card:nth-child(2) .alien-big { color: #ff2dca; }
+[data-theme="anime"] .alien-card:nth-child(3) .alien-big { color: #7a00ff; }
+[data-theme="anime"] .alien-card:nth-child(4) .alien-big { color: #00e5ff; }
+
+
+/* ==========================================================================
+  14. LEGACY / STATS SECTION
+   ========================================================================== */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.stat-card {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-lg) var(--space-md);
+}
+
+.stat-number {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  color: var(--clr-primary);
+  text-shadow: var(--glow-primary);
+  line-height: 1;
+  transition: color var(--transition-slow), text-shadow var(--transition-slow), font-family 0s;
+}
+
+.stat-unit {
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  color: var(--clr-accent);
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+.stat-label {
+  font-family: var(--font-body);
+  font-size: 0.45rem;
+  color: var(--clr-text-muted);
+  margin-top: var(--space-xs);
+  letter-spacing: 0.1em;
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+/* Quote */
+.legacy-quote {
+  position: relative;
+  padding: var(--space-lg);
+  font-style: italic;
+}
+.legacy-quote::before {
+  content: '"';
+  position: absolute;
+  top: -20px;
+  left: var(--space-md);
+  font-family: Georgia, serif;
+  font-size: 8rem;
+  color: var(--clr-primary);
+  opacity: 0.15;
+  line-height: 1;
+}
+.legacy-quote p {
+  font-family: var(--font-body);
+  font-size: clamp(0.55rem, 1.5vw, 0.75rem);
+  color: var(--clr-text);
+  line-height: 2;
+  margin-bottom: var(--space-sm);
+  transition: color var(--transition-slow), font-family 0s;
+}
+.legacy-quote footer {
+  font-size: 0.5rem;
+  color: var(--clr-text-muted);
+  transition: color var(--transition-slow), font-family 0s;
+}
+.legacy-quote cite { color: var(--clr-primary); font-style: normal; transition: color var(--transition-slow); }
+
+
+/* ==========================================================================
+  15. CTA SECTION
+   ========================================================================== */
+
+.cta-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 10vw, 7rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: var(--space-md);
+  transition: font-family 0s;
+}
+.cta-title-line { display: block; color: var(--clr-text); transition: color var(--transition-slow); }
+.cta-title-accent {
+  color: var(--clr-primary);
+  text-shadow: var(--glow-primary);
+  transition: color var(--transition-slow), text-shadow var(--transition-slow);
+}
+
+[data-theme="anime"] .cta-title-accent {
+  background: linear-gradient(135deg, #ff2dca, #7a00ff, #00e5ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
+[data-theme="futuristic"] .cta-title-accent {
+  background: linear-gradient(135deg, #00e5ff, #7b2fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+}
+
+.cta-subtitle {
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  color: var(--clr-text-muted);
+  max-width: 480px;
+  line-height: 2.2;
+  margin: 0 auto var(--space-lg);
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-lg);
+}
+
+/* Scrolling ticker */
+.cta-ticker {
+  width: 100%;
+  overflow: hidden;
+  border-top: 1px solid var(--clr-border);
+  border-bottom: 1px solid var(--clr-border);
+  padding: 10px 0;
+  margin-top: var(--space-lg);
+  white-space: nowrap;
+  transition: border-color var(--transition-slow);
+}
+.ticker-track {
+  display: inline-block;
+  animation: ticker-scroll 20s linear infinite;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.4rem;
+  color: var(--clr-primary);
+  letter-spacing: 0.1em;
+  transition: color var(--transition-slow);
+}
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+
+/* ==========================================================================
+  16. FOOTER
+   ========================================================================== */
+
+.site-footer {
+  position: relative;
+  z-index: 2;
+  background: var(--glass-bg);
+  border-top: var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  transition:
+    background var(--transition-slow),
+    border-color var(--transition-slow),
+    backdrop-filter var(--transition-slow);
+}
+
+.footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-md);
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+.footer-logo-svg {
+  width: 40px;
+  height: 28px;
+  color: var(--clr-primary);
+  filter: drop-shadow(0 0 6px currentColor);
+  margin-bottom: var(--space-xs);
+  transition: color var(--transition-slow), filter var(--transition-slow);
+}
+
+.footer-brand-name {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  color: var(--clr-primary);
+  text-shadow: var(--glow-primary);
+  margin-bottom: 6px;
+  transition: color var(--transition-slow), text-shadow var(--transition-slow), font-family 0s;
+}
+
+.footer-brand-sub {
+  font-size: 0.4rem;
+  color: var(--clr-text-muted);
+  line-height: 2;
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+.footer-nav ul { display: flex; flex-direction: column; gap: var(--space-xs); }
+.footer-nav a {
+  font-family: var(--font-display);
+  font-size: 0.45rem;
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: color var(--transition-fast), font-family 0s;
+}
+.footer-nav a:hover { color: var(--clr-primary); }
+
+.footer-themes p {
+  font-family: var(--font-display);
+  font-size: 0.4rem;
+  color: var(--clr-text-muted);
+  margin-bottom: var(--space-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: color var(--transition-slow), font-family 0s;
+}
+
+.footer-theme-btns { display: flex; gap: 8px; }
+.footer-theme-btn {
+  font-size: 1.4rem;
+  background: none;
+  border: var(--glass-border);
+  border-radius: var(--radius-btn);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-slow),
+    border-radius var(--transition-slow),
+    box-shadow var(--transition-fast);
+}
+.footer-theme-btn:hover {
+  background: rgba(255,255,255,0.08);
+  box-shadow: var(--glow-primary);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding: var(--space-sm) var(--space-md);
+  border-top: var(--glass-border);
+  font-size: 0.4rem;
+  color: var(--clr-text-muted);
+  transition: color var(--transition-slow), border-color var(--transition-slow), font-family 0s;
+}
+
+@media (max-width: 768px) {
+  .footer-inner { grid-template-columns: 1fr; gap: var(--space-md); }
+}
+
+
+/* ==========================================================================
+  17. THEME-SPECIFIC BACKGROUND ACCENTS
+   ========================================================================== */
+
+/* Retro: vignette corners */
+[data-theme="retro"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.7) 100%);
+}
+
+/* Futuristic: subtle radial glow in center */
+[data-theme="futuristic"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse at 50% 30%, rgba(0, 100, 200, 0.1) 0%, transparent 60%);
+}
+
+/* Anime: warm gradient overlay */
+[data-theme="anime"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse at 20% 20%, rgba(122, 0, 255, 0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 80%, rgba(255, 45, 202, 0.08) 0%, transparent 50%);
+}
+
+
+/* ==========================================================================
+  18. FUTURISTIC THEME — EXTRA 3D DEPTH EFFECTS
+   ========================================================================== */
+
+[data-theme="futuristic"] .section-title {
+  text-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+}
+[data-theme="futuristic"] .hero-title-line {
+  text-shadow: 0 4px 20px rgba(0, 229, 255, 0.2);
+}
+
+
+/* ==========================================================================
+  19. ANIME THEME — ANIMATED GRADIENT BORDERS
+   ========================================================================== */
+
+[data-theme="anime"] .glass-card {
+  position: relative;
+  border: none;
+}
+[data-theme="anime"] .glass-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-card);
+  padding: 1px;
+  background: linear-gradient(135deg, #ff2dca, #7a00ff, #00e5ff, #ff2dca);
+  background-size: 300% 300%;
+  animation: gradient-border-spin 6s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+@keyframes gradient-border-spin {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+
+/* Anime floating particle elements (added by JS) */
+.anime-particle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  animation: particle-float linear infinite;
+  opacity: 0.4;
+}
+@keyframes particle-float {
+  0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+  10%  { opacity: 0.4; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(-100px) scale(1); opacity: 0; }
+}
+
+
+/* ==========================================================================
+  20. SCROLL REVEAL ANIMATIONS
+  Elements animate in when they enter the viewport (driven by JS IntersectionObserver)
+   ========================================================================== */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Stagger delays for grid children */
+.reveal:nth-child(1) { transition-delay: 0.0s; }
+.reveal:nth-child(2) { transition-delay: 0.1s; }
+.reveal:nth-child(3) { transition-delay: 0.2s; }
+.reveal:nth-child(4) { transition-delay: 0.3s; }
+
+
+/* ==========================================================================
+  21. ACCESSIBILITY — REDUCED MOTION
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ==========================================================================
+  22. UTILITY CLASSES
+   ========================================================================== */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* ==========================================================================
+  23. CHARACTER VARIANT SYSTEM
+  .v-retro / .v-futuristic / .v-anime — show only the active theme's SVG.
+  Uses display:block (not visibility) so layout is consistent.
+   ========================================================================== */
+
+/* ── Hidden SVG defs block — never takes layout space ── */
+.svg-global-defs {
+  display: block;
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ── Variant base: all hidden by default ── */
+.v-retro,
+.v-futuristic,
+.v-anime {
+  display: none;
+}
+
+/* ── RETRO theme: show only retro variants ── */
+[data-theme="retro"] .v-retro       { display: block; }
+
+/* ── FUTURISTIC theme: show only 3D variants ── */
+[data-theme="futuristic"] .v-futuristic { display: block; }
+
+/* ── ANIME theme: show only anime variants ── */
+[data-theme="anime"] .v-anime       { display: block; }
+
+/* ── char-slot: flex container so SVG sizes correctly ── */
+.char-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── All variant SVGs fill their slot ── */
+.char-slot svg {
+  width: 100%;
+  height: 100%;
+}
+
+
+/* ==========================================================================
+  24. 3D VARIANT — CHARACTER VISUAL POLISH
+  Extra glow, scale animation, and drop-shadow for the 3D SVG variants.
+   ========================================================================== */
+
+/* 3D aliens: cyan metallic glow */
+[data-theme="futuristic"] .alien svg,
+[data-theme="futuristic"] .alien-big svg {
+  filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.7))
+          drop-shadow(0 0 20px rgba(0, 180, 255, 0.4));
+  transition: filter var(--transition-normal);
+}
+[data-theme="futuristic"] .alien-card:hover .alien-big svg {
+  filter: drop-shadow(0 0 16px rgba(0, 229, 255, 1))
+          drop-shadow(0 0 40px rgba(0, 180, 255, 0.6));
+}
+
+/* 3D ship: stronger directional glow from engines */
+[data-theme="futuristic"] .hero-ship svg {
+  filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.8))
+          drop-shadow(0 4px 24px rgba(0, 80, 180, 0.5));
+}
+
+/* 3D aliens: slower float with slight Y-axis tilt illusion */
+[data-theme="futuristic"] .alien-squid { animation-duration: 3.4s; }
+[data-theme="futuristic"] .alien-crab  { animation-duration: 3.8s; }
+
+/* 3D ship: side-to-side with slight perspective tilt */
+[data-theme="futuristic"] .hero-ship svg {
+  animation: ship-3d-hover 2.4s ease-in-out infinite;
+}
+@keyframes ship-3d-hover {
+  0%   { transform: translateX(0)    rotateY(0deg);   }
+  25%  { transform: translateX(12px) rotateY(6deg);   }
+  75%  { transform: translateX(-8px) rotateY(-4deg);  }
+  100% { transform: translateX(0)    rotateY(0deg);   }
+}
+
+/* 3D visor scan-line animation — sweeps the eye glow left to right */
+@keyframes visor-scan {
+  0%   { opacity: 0.6; filter: brightness(0.8); }
+  50%  { opacity: 1;   filter: brightness(1.4); }
+  100% { opacity: 0.6; filter: brightness(0.8); }
+}
+[data-theme="futuristic"] .alien svg rect[fill="url(#mech-eye)"] {
+  animation: visor-scan 2s ease-in-out infinite;
+}
+
+
+/* ==========================================================================
+  25. ANIME VARIANT — CHARACTER VISUAL POLISH
+  Warm pink glow, bouncy float, and per-alien hue differences.
+   ========================================================================== */
+
+/* Anime aliens: warm pink-purple glow */
+[data-theme="anime"] .alien svg,
+[data-theme="anime"] .alien-big svg {
+  filter: drop-shadow(0 0 8px rgba(255, 45, 202, 0.6))
+          drop-shadow(0 0 18px rgba(168, 85, 247, 0.4));
+  transition: filter var(--transition-normal);
+}
+[data-theme="anime"] .alien-card:hover .alien-big svg {
+  filter: drop-shadow(0 0 16px rgba(255, 45, 202, 1))
+          drop-shadow(0 0 36px rgba(168, 85, 247, 0.7));
+}
+
+/* Per-alien colour glow in hero — each alien gets its own hue */
+[data-theme="anime"] .alien-squid svg {
+  filter: drop-shadow(0 0 10px rgba(255, 107, 254, 0.8));
+}
+[data-theme="anime"] .alien-crab svg {
+  filter: drop-shadow(0 0 10px rgba(255, 149, 80, 0.8));
+}
+[data-theme="anime"] .alien-octopus svg {
+  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.8));
+}
+
+/* Anime ship: sparkly glow */
+[data-theme="anime"] .hero-ship svg {
+  filter: drop-shadow(0 0 12px rgba(255, 45, 202, 0.7))
+          drop-shadow(0 0 28px rgba(122, 0, 255, 0.4));
+}
+
+/* Anime ship: playful bouncy movement */
+[data-theme="anime"] .hero-ship svg {
+  animation: ship-anime-bounce 1.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+}
+@keyframes ship-anime-bounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30%       { transform: translateY(-8px) rotate(-3deg); }
+  60%       { transform: translateY(-4px) rotate(2deg); }
+}
+
+/* Anime: bigger, bouncier alien float */
+[data-theme="anime"] .alien { animation-timing-function: cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+[data-theme="anime"] .alien-squid  { animation-duration: 2.2s; }
+[data-theme="anime"] .alien-crab   { animation-duration: 2.6s; }
+[data-theme="anime"] .alien-octopus{ animation-duration: 2.0s; }
+
+/* Anime card alien: gentle sway as well as float */
+@keyframes alien-anime-sway {
+  0%, 100% { transform: translateY(0)   rotate(0deg);  }
+  33%       { transform: translateY(-10px) rotate(-4deg); }
+  66%       { transform: translateY(-6px)  rotate(3deg);  }
+}
+[data-theme="anime"] .alien-card .alien-big svg {
+  animation: alien-anime-sway 2.8s ease-in-out infinite;
+}
+
+
+/* ==========================================================================
+  26. MINI GRID CELLS — theme variants
+  The JS-generated .mini-alien-cell gets different shapes per theme.
+   ========================================================================== */
+
+/* Futuristic: octagonal mechanical shape */
+[data-theme="futuristic"] .mini-alien-cell {
+  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+  background: linear-gradient(135deg, #00e5ff, #004488);
+  box-shadow: 0 0 6px #00e5ff, 0 0 14px rgba(0,229,255,0.4);
+}
+
+/* Anime: perfect circle bubbly cells */
+[data-theme="anime"] .mini-alien-cell {
+  clip-path: circle(50%);
+  background: linear-gradient(135deg, #ff6bfe, #7a00ff);
+  box-shadow: 0 0 8px rgba(255, 45, 202, 0.7);
+}
+
+/* Anime mini shields: rounded */
+[data-theme="anime"] .mini-shield {
+  background: linear-gradient(135deg, #ff2dca, #7a00ff);
+  border-radius: 50% 50% 0 0;
+  clip-path: none;
+  box-shadow: 0 0 8px rgba(255, 45, 202, 0.6);
+}
+
+/* Futuristic mini shields: metallic look */
+[data-theme="futuristic"] .mini-shield {
+  background: linear-gradient(180deg, #00e5ff 0%, #003355 100%);
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.6);
+}

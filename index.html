@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="retro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Space Invaders — The Arcade Legend</title>
+  <meta name="description" content="The classic 1978 arcade game by Tomohiro Nishikado. Defend Earth from waves of alien invaders." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============================================================
+       GLOBAL SVG GRADIENT DEFINITIONS
+       All gradient IDs live here so they're always in the DOM,
+       regardless of which theme-variant SVGs are hidden by CSS.
+  ============================================================ -->
+  <svg class="svg-global-defs" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="mech-body" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#1a6080"/>
+        <stop offset="45%"  stop-color="#0d3d52"/>
+        <stop offset="100%" stop-color="#040f1a"/>
+      </linearGradient>
+      <linearGradient id="mech-eye" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%"   stop-color="#00d4ff" stop-opacity="0.4"/>
+        <stop offset="50%"  stop-color="#00ffff"/>
+        <stop offset="100%" stop-color="#00d4ff" stop-opacity="0.4"/>
+      </linearGradient>
+      <linearGradient id="ship-3d-body" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#1e7090"/>
+        <stop offset="50%"  stop-color="#0a3d55"/>
+        <stop offset="100%" stop-color="#030f1c"/>
+      </linearGradient>
+      <radialGradient id="ship-3d-engine" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"   stop-color="#00ffff"/>
+        <stop offset="100%" stop-color="#0050aa" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="ufo-3d-rim" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#2490b0"/>
+        <stop offset="100%" stop-color="#051828"/>
+      </linearGradient>
+      <linearGradient id="anime-ship-body" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%"   stop-color="#ff6bfe"/>
+        <stop offset="100%" stop-color="#7a00ff"/>
+      </linearGradient>
+      <linearGradient id="anime-ufo-body" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%"   stop-color="#ff6bfe"/>
+        <stop offset="100%" stop-color="#a855f7"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="theme-veil" id="theme-veil" aria-hidden="true"></div>
+
+  <!-- ============================================================  NAVIGATION  ============================================================ -->
+  <nav class="site-nav" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a class="nav-logo" href="#" aria-label="Space Invaders home">
+        <svg class="nav-logo-svg" viewBox="0 0 44 32" fill="none" aria-hidden="true">
+          <rect x="4"  y="0"  width="4" height="4" fill="currentColor"/><rect x="36" y="0"  width="4" height="4" fill="currentColor"/>
+          <rect x="8"  y="4"  width="4" height="4" fill="currentColor"/><rect x="32" y="4"  width="4" height="4" fill="currentColor"/>
+          <rect x="4"  y="8"  width="36" height="4" fill="currentColor"/>
+          <rect x="0"  y="12" width="4" height="4" fill="currentColor"/><rect x="8"  y="12" width="4" height="4" fill="currentColor"/>
+          <rect x="20" y="12" width="4" height="4" fill="currentColor"/><rect x="32" y="12" width="4" height="4" fill="currentColor"/>
+          <rect x="40" y="12" width="4" height="4" fill="currentColor"/>
+          <rect x="0"  y="16" width="44" height="4" fill="currentColor"/>
+          <rect x="0"  y="20" width="4" height="4" fill="currentColor"/><rect x="40" y="20" width="4" height="4" fill="currentColor"/>
+          <rect x="8"  y="24" width="4" height="4" fill="currentColor"/><rect x="32" y="24" width="4" height="4" fill="currentColor"/>
+          <rect x="4"  y="28" width="4" height="4" fill="currentColor"/><rect x="36" y="28" width="4" height="4" fill="currentColor"/>
+        </svg>
+        <span class="nav-logo-text">SPACE INVADERS</span>
+      </a>
+      <ul class="nav-links" role="list">
+        <li><a href="#story">Origin</a></li>
+        <li><a href="#gameplay">Gameplay</a></li>
+        <li><a href="#aliens">Enemies</a></li>
+        <li><a href="#legacy">Legacy</a></li>
+      </ul>
+      <div class="theme-switcher" role="group" aria-label="Select visual theme">
+        <button class="theme-btn active" data-theme-target="retro"      aria-pressed="true"  title="Retro"><span class="theme-btn-icon">🎮</span><span class="theme-btn-label">RETRO</span></button>
+        <button class="theme-btn"        data-theme-target="futuristic" aria-pressed="false" title="3D Futuristic"><span class="theme-btn-icon">🧊</span><span class="theme-btn-label">FUTURE</span></button>
+        <button class="theme-btn"        data-theme-target="anime"      aria-pressed="false" title="Anime"><span class="theme-btn-icon">🌸</span><span class="theme-btn-label">ANIME</span></button>
+      </div>
+      <button class="nav-menu-toggle" id="nav-menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobile-menu" role="menu" aria-hidden="true">
+      <ul role="list">
+        <li><a href="#story"    role="menuitem">Origin</a></li>
+        <li><a href="#gameplay" role="menuitem">Gameplay</a></li>
+        <li><a href="#aliens"   role="menuitem">Enemies</a></li>
+        <li><a href="#legacy"   role="menuitem">Legacy</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ============================================================  HERO  ============================================================ -->
+  <header class="hero" id="home" role="banner">
+    <div class="hero-inner">
+
+      <!-- ALIEN FORMATION
+          Each .char-slot contains exactly 3 SVG variants.
+          CSS data-theme rules show only the active variant. -->
+      <div class="hero-aliens" aria-hidden="true">
+
+        <!-- SQUID — top row -->
+        <div class="char-slot alien alien-squid">
+          <!-- ▸ RETRO pixel squid -->
+          <svg class="v-retro" viewBox="0 0 32 24" fill="none">
+            <rect x="12" y="0" width="8" height="4" fill="currentColor"/>
+            <rect x="4"  y="4" width="24" height="4" fill="currentColor"/>
+            <rect x="0"  y="8" width="32" height="4" fill="currentColor"/>
+            <rect x="0"  y="12" width="4"  height="4" fill="currentColor"/><rect x="8"  y="12" width="4"  height="4" fill="currentColor"/>
+            <rect x="20" y="12" width="4"  height="4" fill="currentColor"/><rect x="28" y="12" width="4"  height="4" fill="currentColor"/>
+            <rect x="4"  y="16" width="24" height="4" fill="currentColor"/>
+            <rect x="4"  y="20" width="4"  height="4" fill="currentColor"/><rect x="24" y="20" width="4"  height="4" fill="currentColor"/>
+          </svg>
+          <!-- ▸ 3D mech spider-walker -->
+          <svg class="v-futuristic" viewBox="0 0 68 66" fill="none">
+            <polygon points="0,26 6,18 6,42 0,38"   fill="#061828" stroke="#00e5ff" stroke-width="1"/>
+            <polygon points="68,26 62,18 62,42 68,38" fill="#061828" stroke="#00e5ff" stroke-width="1"/>
+            <polygon points="8,12 60,12 64,50 4,50"  fill="url(#mech-body)"/>
+            <polygon points="10,13 58,13 60,24 8,24" fill="rgba(0,220,255,0.1)"/>
+            <line x1="8" y1="28" x2="60" y2="28" stroke="rgba(0,200,255,0.25)" stroke-width="0.7"/>
+            <line x1="9" y1="38" x2="59" y2="38" stroke="rgba(0,200,255,0.25)" stroke-width="0.7"/>
+            <polygon points="8,12 60,12 64,50 4,50"  fill="none" stroke="#00e5ff" stroke-width="1.2"/>
+            <rect x="12" y="17" width="16" height="8" rx="2" fill="url(#mech-eye)"/>
+            <rect x="40" y="17" width="16" height="8" rx="2" fill="url(#mech-eye)"/>
+            <rect x="28" y="32" width="12" height="8" rx="2" fill="rgba(0,229,255,0.15)" stroke="#00e5ff" stroke-width="0.8"/>
+            <circle cx="11" cy="15" r="1.5" fill="#00e5ff" opacity="0.7"/>
+            <circle cx="57" cy="15" r="1.5" fill="#00e5ff" opacity="0.7"/>
+            <circle cx="9"  cy="46" r="1.5" fill="#00e5ff" opacity="0.7"/>
+            <circle cx="59" cy="46" r="1.5" fill="#00e5ff" opacity="0.7"/>
+            <line x1="16" y1="50" x2="6"  y2="64" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="26" y1="50" x2="20" y2="64" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="42" y1="50" x2="48" y2="64" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="52" y1="50" x2="62" y2="64" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="6"  cy="64" r="2.5" fill="#00e5ff"/>
+            <circle cx="20" cy="64" r="2.5" fill="#00e5ff"/>
+            <circle cx="48" cy="64" r="2.5" fill="#00e5ff"/>
+            <circle cx="62" cy="64" r="2.5" fill="#00e5ff"/>
+            <line x1="34" y1="12" x2="34" y2="3" stroke="#00e5ff" stroke-width="1.5"/>
+            <circle cx="34" cy="2" r="3" fill="#00ffff"/>
+          </svg>
+          <!-- ▸ ANIME kawaii blob-squid -->
+          <svg class="v-anime" viewBox="0 0 68 76" fill="none">
+            <ellipse cx="34" cy="30" rx="24" ry="22" fill="#ff6bfe"/>
+            <path d="M22 10 Q14 2 10 0" stroke="#e040fb" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <circle cx="9"  cy="0" r="4" fill="#ffb3ff" stroke="#e040fb" stroke-width="1"/>
+            <path d="M46 10 Q54 2 58 0" stroke="#e040fb" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <circle cx="59" cy="0" r="4" fill="#ffb3ff" stroke="#e040fb" stroke-width="1"/>
+            <circle cx="23" cy="26" r="10" fill="white" stroke="#e040fb" stroke-width="1.5"/>
+            <circle cx="23" cy="27" r="6.5" fill="#2a0040"/>
+            <circle cx="26" cy="23" r="2.5" fill="white"/>
+            <circle cx="45" cy="26" r="10" fill="white" stroke="#e040fb" stroke-width="1.5"/>
+            <circle cx="45" cy="27" r="6.5" fill="#2a0040"/>
+            <circle cx="48" cy="23" r="2.5" fill="white"/>
+            <path d="M26 38 Q34 44 42 38" stroke="#c020b0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <ellipse cx="13" cy="34" rx="6" ry="4" fill="#ff8080" opacity="0.45"/>
+            <ellipse cx="55" cy="34" rx="6" ry="4" fill="#ff8080" opacity="0.45"/>
+            <ellipse cx="13" cy="55" rx="5.5" ry="9" fill="#e040fb"/>
+            <ellipse cx="23" cy="60" rx="5.5" ry="9" fill="#ff6bfe"/>
+            <ellipse cx="34" cy="62" rx="5.5" ry="9" fill="#e040fb"/>
+            <ellipse cx="45" cy="60" rx="5.5" ry="9" fill="#ff6bfe"/>
+            <ellipse cx="55" cy="55" rx="5.5" ry="9" fill="#e040fb"/>
+          </svg>
+        </div>
+
+        <!-- CRAB — middle row -->
+        <div class="char-slot alien alien-crab">
+          <!-- ▸ RETRO -->
+          <svg class="v-retro" viewBox="0 0 32 24" fill="none">
+            <rect x="4"  y="0"  width="4"  height="4" fill="currentColor"/><rect x="24" y="0"  width="4"  height="4" fill="currentColor"/>
+            <rect x="0"  y="4"  width="32" height="4" fill="currentColor"/>
+            <rect x="0"  y="8"  width="4"  height="4" fill="currentColor"/><rect x="8"  y="8"  width="4"  height="4" fill="currentColor"/>
+            <rect x="20" y="8"  width="4"  height="4" fill="currentColor"/><rect x="28" y="8"  width="4"  height="4" fill="currentColor"/>
+            <rect x="4"  y="12" width="24" height="4" fill="currentColor"/>
+            <rect x="8"  y="16" width="4"  height="4" fill="currentColor"/><rect x="20" y="16" width="4"  height="4" fill="currentColor"/>
+            <rect x="0"  y="20" width="8"  height="4" fill="currentColor"/><rect x="24" y="20" width="8"  height="4" fill="currentColor"/>
+          </svg>
+          <!-- ▸ 3D armoured tank-crab -->
+          <svg class="v-futuristic" viewBox="0 0 80 60" fill="none">
+            <polyline points="12,28 2,20 -4,28 2,36 12,32"   stroke="#00e5ff" stroke-width="2" stroke-linejoin="round" fill="#061828"/>
+            <polyline points="68,28 78,20 84,28 78,36 68,32" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round" fill="#061828"/>
+            <line x1="-4" y1="28" x2="-8" y2="23" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="-4" y1="28" x2="-8" y2="33" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="84" y1="28" x2="88" y2="23" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="84" y1="28" x2="88" y2="33" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <rect x="16" y="10" width="48" height="10" rx="3" fill="#0d3d52" stroke="#00e5ff" stroke-width="1"/>
+            <rect x="10" y="18" width="60" height="28" rx="5" fill="url(#mech-body)" stroke="#00e5ff" stroke-width="1.2"/>
+            <rect x="12" y="19" width="56" height="11" rx="3" fill="rgba(0,220,255,0.1)"/>
+            <rect x="16" y="23" width="48" height="14" rx="3" fill="#000d1a" stroke="#00e5ff" stroke-width="1"/>
+            <rect x="18" y="25" width="44" height="10" rx="2" fill="url(#mech-eye)"/>
+            <line x1="40" y1="24" x2="40" y2="37" stroke="rgba(0,10,20,0.7)" stroke-width="1.5"/>
+            <circle cx="14" cy="22" r="1.8" fill="#00e5ff" opacity="0.8"/>
+            <circle cx="66" cy="22" r="1.8" fill="#00e5ff" opacity="0.8"/>
+            <circle cx="14" cy="42" r="1.8" fill="#00e5ff" opacity="0.8"/>
+            <circle cx="66" cy="42" r="1.8" fill="#00e5ff" opacity="0.8"/>
+            <line x1="12" y1="38" x2="68" y2="38" stroke="rgba(0,200,255,0.2)" stroke-width="0.8"/>
+            <line x1="20" y1="46" x2="16" y2="56" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="32" y1="46" x2="30" y2="56" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="48" y1="46" x2="50" y2="56" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="60" y1="46" x2="64" y2="56" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="16" cy="56" r="2" fill="#00e5ff"/>
+            <circle cx="30" cy="56" r="2" fill="#00e5ff"/>
+            <circle cx="50" cy="56" r="2" fill="#00e5ff"/>
+            <circle cx="64" cy="56" r="2" fill="#00e5ff"/>
+          </svg>
+          <!-- ▸ ANIME chubby chibi-crab -->
+          <svg class="v-anime" viewBox="0 0 80 64" fill="none">
+            <circle cx="10" cy="28" r="12" fill="#e07030" stroke="#ff9550" stroke-width="1.5"/>
+            <circle cx="7"  cy="21" r="7"  fill="#ff9550"/>
+            <circle cx="7"  cy="35" r="7"  fill="#ff9550"/>
+            <circle cx="70" cy="28" r="12" fill="#e07030" stroke="#ff9550" stroke-width="1.5"/>
+            <circle cx="73" cy="21" r="7"  fill="#ff9550"/>
+            <circle cx="73" cy="35" r="7"  fill="#ff9550"/>
+            <ellipse cx="40" cy="32" rx="22" ry="20" fill="#ff9550"/>
+            <line x1="30" y1="14" x2="26" y2="7" stroke="#ff9550" stroke-width="4" stroke-linecap="round"/>
+            <line x1="50" y1="14" x2="54" y2="7" stroke="#ff9550" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="25" cy="6"  r="8"  fill="white" stroke="#e07030" stroke-width="1.5"/>
+            <circle cx="25" cy="7"  r="5"  fill="#2a0040"/>
+            <circle cx="27" cy="4"  r="2"  fill="white"/>
+            <circle cx="55" cy="6"  r="8"  fill="white" stroke="#e07030" stroke-width="1.5"/>
+            <circle cx="55" cy="7"  r="5"  fill="#2a0040"/>
+            <circle cx="57" cy="4"  r="2"  fill="white"/>
+            <path d="M30 38 Q40 46 50 38" stroke="#c05020" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <ellipse cx="24" cy="34" rx="6" ry="4" fill="#ff8080" opacity="0.4"/>
+            <ellipse cx="56" cy="34" rx="6" ry="4" fill="#ff8080" opacity="0.4"/>
+            <ellipse cx="26" cy="52" rx="5" ry="7" fill="#e07030"/>
+            <ellipse cx="36" cy="55" rx="5" ry="7" fill="#e07030"/>
+            <ellipse cx="44" cy="55" rx="5" ry="7" fill="#e07030"/>
+            <ellipse cx="54" cy="52" rx="5" ry="7" fill="#e07030"/>
+          </svg>
+        </div>
+
+        <!-- OCTOPUS — bottom row -->
+        <div class="char-slot alien alien-octopus">
+          <!-- ▸ RETRO -->
+          <svg class="v-retro" viewBox="0 0 32 24" fill="none">
+            <rect x="8"  y="0"  width="16" height="4" fill="currentColor"/>
+            <rect x="4"  y="4"  width="24" height="4" fill="currentColor"/>
+            <rect x="0"  y="8"  width="32" height="4" fill="currentColor"/>
+            <rect x="0"  y="12" width="8"  height="4" fill="currentColor"/><rect x="12" y="12" width="8"  height="4" fill="currentColor"/>
+            <rect x="24" y="12" width="8"  height="4" fill="currentColor"/>
+            <rect x="0"  y="16" width="32" height="4" fill="currentColor"/>
+            <rect x="4"  y="20" width="4"  height="4" fill="currentColor"/><rect x="12" y="20" width="8"  height="4" fill="currentColor"/>
+            <rect x="24" y="20" width="4"  height="4" fill="currentColor"/>
+          </svg>
+          <!-- ▸ 3D surveillance drone -->
+          <svg class="v-futuristic" viewBox="0 0 72 70" fill="none">
+            <line x1="36" y1="24" x2="10" y2="8"  stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="36" y1="24" x2="4"  y2="28" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="36" y1="30" x2="4"  y2="42" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="36" y1="34" x2="12" y2="54" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="36" y1="34" x2="60" y2="54" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="36" y1="30" x2="68" y2="42" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="36" y1="24" x2="68" y2="28" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <line x1="36" y1="24" x2="62" y2="8"  stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="10" cy="8"  r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+            <circle cx="4"  cy="28" r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+            <circle cx="4"  cy="42" r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+            <circle cx="12" cy="54" r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+            <circle cx="60" cy="54" r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+            <circle cx="68" cy="42" r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+            <circle cx="68" cy="28" r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+            <circle cx="62" cy="8"  r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+            <ellipse cx="36" cy="28" rx="26" ry="20" fill="url(#mech-body)" stroke="#00e5ff" stroke-width="1.2"/>
+            <ellipse cx="36" cy="22" rx="18" ry="10" fill="rgba(0,220,255,0.1)"/>
+            <circle cx="36" cy="28" r="13" fill="#000d1a" stroke="#00e5ff" stroke-width="1.5"/>
+            <circle cx="36" cy="28" r="8"  fill="url(#mech-eye)"/>
+            <circle cx="36" cy="28" r="4"  fill="#000a14"/>
+            <circle cx="40" cy="24" r="2.5" fill="white" opacity="0.6"/>
+            <circle cx="36" cy="28" r="13" fill="none" stroke="rgba(0,200,255,0.3)" stroke-width="0.8" stroke-dasharray="4 3"/>
+          </svg>
+          <!-- ▸ ANIME round kawaii-octopus -->
+          <svg class="v-anime" viewBox="0 0 72 76" fill="none">
+            <polygon points="28,4 36,10 28,16" fill="#ff2dca"/>
+            <polygon points="44,4 36,10 44,16" fill="#ff2dca"/>
+            <circle cx="36" cy="10" r="4" fill="#ff6bfe"/>
+            <circle cx="36" cy="30" r="24" fill="#a855f7"/>
+            <circle cx="26" cy="26" r="10" fill="white" stroke="#7e22ce" stroke-width="1.5"/>
+            <circle cx="26" cy="27" r="6.5" fill="#2a0040"/>
+            <circle cx="29" cy="23" r="2.5" fill="white"/>
+            <circle cx="28" cy="22" r="1.2" fill="white" opacity="0.8"/>
+            <circle cx="46" cy="26" r="10" fill="white" stroke="#7e22ce" stroke-width="1.5"/>
+            <circle cx="46" cy="27" r="6.5" fill="#2a0040"/>
+            <circle cx="49" cy="23" r="2.5" fill="white"/>
+            <circle cx="48" cy="22" r="1.2" fill="white" opacity="0.8"/>
+            <path d="M22 38 Q36 48 50 38" stroke="#7e22ce" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <ellipse cx="14" cy="34" rx="7" ry="5" fill="#ff80ff" opacity="0.4"/>
+            <ellipse cx="58" cy="34" rx="7" ry="5" fill="#ff80ff" opacity="0.4"/>
+            <path d="M16 50 Q10 60 16 68" stroke="#7e22ce" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <path d="M22 52 Q18 62 22 70" stroke="#9333ea" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <path d="M29 54 Q27 64 30 72" stroke="#7e22ce" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <path d="M36 54 Q36 64 36 72" stroke="#9333ea" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <path d="M43 54 Q45 64 42 72" stroke="#7e22ce" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <path d="M50 52 Q54 62 50 70" stroke="#9333ea" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <path d="M56 50 Q62 60 56 68" stroke="#7e22ce" stroke-width="5" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+      </div><!-- /.hero-aliens -->
+
+      <!-- HERO TEXT -->
+      <div class="hero-content">
+        <p class="hero-kicker">INSERT COIN TO CONTINUE</p>
+        <h1 class="hero-title">
+          <span class="hero-title-line">SPACE</span>
+          <span class="hero-title-line hero-title-accent">INVADERS</span>
+        </h1>
+        <p class="hero-subtitle">The game that launched an industry. Tomohiro Nishikado's 1978 masterpiece that defined arcade gaming forever.</p>
+        <div class="hero-score-row" aria-label="Original point values">
+          <span class="score-item"><span class="score-icon">🛸</span> = 300 PTS</span>
+          <span class="score-item"><span class="score-icon">👾</span> = 30 PTS</span>
+          <span class="score-item"><span class="score-icon">🤖</span> = 20 PTS</span>
+          <span class="score-item"><span class="score-icon">🐙</span> = 10 PTS</span>
+        </div>
+        <div class="hero-cta-row">
+          <a href="#gameplay" class="btn btn-primary"><span class="btn-text">PLAY NOW</span><span class="btn-glow" aria-hidden="true"></span></a>
+          <a href="#story"    class="btn btn-secondary">LEARN MORE</a>
+        </div>
+      </div>
+
+      <!-- HERO SHIP — theme variants -->
+      <div class="hero-ship-wrap" aria-hidden="true">
+        <div class="char-slot hero-ship">
+          <!-- ▸ RETRO pixel cannon -->
+          <svg class="v-retro" viewBox="0 0 48 32" fill="none">
+            <rect x="20" y="0"  width="8"  height="4" fill="currentColor"/>
+            <rect x="16" y="4"  width="16" height="4" fill="currentColor"/>
+            <rect x="0"  y="8"  width="48" height="4" fill="currentColor"/>
+            <rect x="0"  y="12" width="48" height="4" fill="currentColor"/>
+            <rect x="0"  y="16" width="16" height="4" fill="currentColor"/>
+            <rect x="20" y="16" width="8"  height="4" fill="currentColor"/>
+            <rect x="32" y="16" width="16" height="4" fill="currentColor"/>
+            <rect x="0"  y="20" width="8"  height="4" fill="currentColor"/>
+            <rect x="16" y="20" width="16" height="4" fill="currentColor"/>
+            <rect x="40" y="20" width="8"  height="4" fill="currentColor"/>
+            <rect x="22" y="24" width="4" height="8" fill="currentColor" class="laser-beam"/>
+          </svg>
+          <!-- ▸ 3D delta-wing fighter -->
+          <svg class="v-futuristic" viewBox="0 0 96 56" fill="none">
+            <ellipse cx="16" cy="40" rx="9" ry="6" fill="url(#ship-3d-engine)" opacity="0.9"/>
+            <ellipse cx="80" cy="40" rx="9" ry="6" fill="url(#ship-3d-engine)" opacity="0.9"/>
+            <polygon points="12,20 44,26 44,40 4,50 0,44" fill="url(#ship-3d-body)" stroke="#00e5ff" stroke-width="1"/>
+            <polygon points="84,20 52,26 52,40 92,50 96,44" fill="url(#ship-3d-body)" stroke="#00e5ff" stroke-width="1"/>
+            <polygon points="14,22 42,27 42,34 16,33" fill="rgba(0,220,255,0.1)"/>
+            <polygon points="82,22 54,27 54,34 80,33" fill="rgba(0,220,255,0.1)"/>
+            <polygon points="48,2 60,14 64,42 48,52 32,42 36,14" fill="url(#ship-3d-body)" stroke="#00e5ff" stroke-width="1.2"/>
+            <polygon points="44,6 52,6 56,17 48,19 40,17" fill="rgba(0,220,255,0.12)"/>
+            <ellipse cx="48" cy="20" rx="10" ry="8" fill="rgba(0,50,80,0.8)" stroke="#00e5ff" stroke-width="1"/>
+            <ellipse cx="48" cy="18" rx="6" ry="4" fill="rgba(0,229,255,0.2)"/>
+            <line x1="48" y1="26" x2="48" y2="46" stroke="rgba(0,200,255,0.3)" stroke-width="0.8"/>
+            <line x1="40" y1="22" x2="56" y2="22" stroke="rgba(0,200,255,0.2)" stroke-width="0.7"/>
+            <rect x="10" y="36" width="12" height="7" rx="2" fill="#061828" stroke="#00e5ff" stroke-width="1"/>
+            <rect x="74" y="36" width="12" height="7" rx="2" fill="#061828" stroke="#00e5ff" stroke-width="1"/>
+            <rect x="46" y="48" width="4" height="10" rx="1" fill="#00ffff" class="laser-beam"/>
+          </svg>
+          <!-- ▸ ANIME cute starship -->
+          <svg class="v-anime" viewBox="0 0 96 64" fill="none">
+            <circle cx="6"  cy="44" r="4"   fill="#ffaaff" opacity="0.6"/>
+            <circle cx="14" cy="52" r="2.5" fill="#ff2dca" opacity="0.5"/>
+            <circle cx="4"  cy="56" r="2"   fill="#ffaaff" opacity="0.4"/>
+            <path d="M14 24 Q4 32 8 50 L34 46 Z"  fill="#ff6bfe" stroke="#e040fb" stroke-width="1.5"/>
+            <path d="M82 24 Q92 32 88 50 L62 46 Z" fill="#ff6bfe" stroke="#e040fb" stroke-width="1.5"/>
+            <text x="11" y="42" font-size="11" fill="#ffaaff" opacity="0.8">★</text>
+            <text x="68" y="42" font-size="11" fill="#ffaaff" opacity="0.8">★</text>
+            <ellipse cx="48" cy="32" rx="24" ry="22" fill="url(#anime-ship-body)"/>
+            <ellipse cx="44" cy="22" rx="10" ry="7" fill="rgba(255,255,255,0.2)"/>
+            <path d="M44 10 Q48 2 52 10" fill="#e040fb" stroke="#c020b0" stroke-width="1"/>
+            <circle cx="48" cy="32" r="14" fill="white" stroke="#e040fb" stroke-width="2"/>
+            <circle cx="48" cy="32" r="9"  fill="#a855f7"/>
+            <circle cx="48" cy="32" r="5"  fill="#2a0040"/>
+            <circle cx="52" cy="28" r="3"   fill="white"/>
+            <circle cx="51" cy="27" r="1.5" fill="white" opacity="0.8"/>
+            <rect x="44" y="52" width="8" height="12" rx="4" fill="#ffaaff" class="laser-beam"/>
+            <text x="26" y="36" font-size="9" fill="#ffaaff" opacity="0.7">♥</text>
+            <text x="60" y="36" font-size="9" fill="#ffaaff" opacity="0.7">♥</text>
+          </svg>
+        </div>
+      </div>
+
+    </div><!-- /.hero-inner -->
+    <div class="hero-scroll-hint" aria-hidden="true">
+      <span class="scroll-label">SCROLL DOWN</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </header>
+
+  <!-- ============================================================  STORY  ============================================================ -->
+  <section class="section section-story" id="story" aria-labelledby="story-heading">
+    <div class="section-inner">
+      <div class="section-label">// CHAPTER 01</div>
+      <h2 class="section-title" id="story-heading">The Origin Story</h2>
+      <div class="story-grid">
+        <article class="story-card glass-card">
+          <div class="card-year">1978</div>
+          <h3 class="card-title">Born in Japan</h3>
+          <p class="card-body">Tomohiro Nishikado hand-built both the hardware and software from scratch, designing custom silicon to render faster than any existing chip. Originally the invaders were tanks — until he discovered H.G. Wells' <em>War of the Worlds</em>.</p>
+        </article>
+        <article class="story-card glass-card">
+          <div class="card-year">10M+</div>
+          <h3 class="card-title">Cabinets Sold</h3>
+          <p class="card-body">Space Invaders caused a national shortage of 100-yen coins in Japan. Taito and Midway produced over 100,000 cabinets, earning more than $2 billion in its first year — establishing the video game industry as an economic force.</p>
+        </article>
+        <article class="story-card glass-card">
+          <div class="card-year">∞</div>
+          <h3 class="card-title">Legacy Defined</h3>
+          <p class="card-body">It introduced high scores, progressively difficult waves, boss enemies, and lives — mechanics still found in virtually every action game today. Space Invaders didn't just start gaming; it invented its grammar.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================  GAMEPLAY  ============================================================ -->
+  <section class="section section-gameplay" id="gameplay" aria-labelledby="gameplay-heading">
+    <div class="section-inner">
+      <div class="section-label">// CHAPTER 02</div>
+      <h2 class="section-title" id="gameplay-heading">Gameplay Mechanics</h2>
+      <div class="gameplay-layout">
+        <div class="gameplay-screen" aria-label="Gameplay screen mockup" role="img">
+          <div class="screen-bezel">
+            <div class="screen-face">
+              <div class="screen-hud">
+                <span>SCORE<br/><strong id="demo-score">0360</strong></span>
+                <span>HI-SCORE<br/><strong>9990</strong></span>
+                <span>LIVES<br/><strong>▶ ▶ ▶</strong></span>
+              </div>
+              <div class="mini-alien-grid" id="mini-grid" aria-hidden="true"></div>
+              <div class="mini-shields" aria-hidden="true">
+                <div class="mini-shield"></div><div class="mini-shield"></div>
+                <div class="mini-shield"></div><div class="mini-shield"></div>
+              </div>
+              <!-- Mini player — theme variants -->
+              <div class="mini-player" aria-hidden="true">
+                <div class="char-slot mini-ship">
+                  <svg class="v-retro" viewBox="0 0 24 16" fill="none">
+                    <rect x="10" y="0" width="4"  height="4" fill="currentColor"/>
+                    <rect x="6"  y="4" width="12" height="4" fill="currentColor"/>
+                    <rect x="0"  y="8" width="24" height="8" fill="currentColor"/>
+                  </svg>
+                  <svg class="v-futuristic" viewBox="0 0 36 22" fill="none">
+                    <polygon points="6,8 16,10 16,16 2,20"   fill="url(#ship-3d-body)" stroke="#00e5ff" stroke-width="0.8"/>
+                    <polygon points="30,8 20,10 20,16 34,20" fill="url(#ship-3d-body)" stroke="#00e5ff" stroke-width="0.8"/>
+                    <polygon points="18,0 22,6 24,18 18,20 12,18 14,6" fill="url(#ship-3d-body)" stroke="#00e5ff" stroke-width="0.8"/>
+                    <ellipse cx="18" cy="8" rx="4" ry="3" fill="rgba(0,50,80,0.8)" stroke="#00e5ff" stroke-width="0.7"/>
+                  </svg>
+                  <svg class="v-anime" viewBox="0 0 36 22" fill="none">
+                    <path d="M6 8 Q2 14 4 20 L16 17 Z"  fill="#ff6bfe" stroke="#e040fb" stroke-width="0.8"/>
+                    <path d="M30 8 Q34 14 32 20 L20 17 Z" fill="#ff6bfe" stroke="#e040fb" stroke-width="0.8"/>
+                    <ellipse cx="18" cy="12" rx="10" ry="9" fill="url(#anime-ship-body)"/>
+                    <circle cx="18" cy="12" r="5.5" fill="white" stroke="#e040fb" stroke-width="0.8"/>
+                    <circle cx="18" cy="12" r="3"   fill="#a855f7"/>
+                    <circle cx="20" cy="10" r="1.2" fill="white"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mechanics-list">
+          <div class="mechanic-item glass-card"><div class="mechanic-icon">🎯</div><div class="mechanic-content"><h3>Adaptive Difficulty</h3><p>As you eliminate invaders, the remaining ones accelerate — exponentially rising tension with every kill.</p></div></div>
+          <div class="mechanic-item glass-card"><div class="mechanic-icon">🛡️</div><div class="mechanic-content"><h3>Destructible Shields</h3><p>Four bunkers gradually eroded by both enemy and player fire, forcing tactical decisions.</p></div></div>
+          <div class="mechanic-item glass-card"><div class="mechanic-icon">🛸</div><div class="mechanic-content"><h3>The Mystery Ship</h3><p>A UFO drifts across the top at irregular intervals. Its bonus value is secretly determined by your shot count.</p></div></div>
+          <div class="mechanic-item glass-card"><div class="mechanic-icon">⬇️</div><div class="mechanic-content"><h3>Descent Mechanic</h3><p>Invaders march left and right, dropping lower on each edge bounce — a ticking clock.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================  ALIENS SHOWCASE  ============================================================ -->
+  <section class="section section-aliens" id="aliens" aria-labelledby="aliens-heading">
+    <div class="section-inner">
+      <div class="section-label">// CHAPTER 03</div>
+      <h2 class="section-title" id="aliens-heading">The Invaders</h2>
+      <p class="section-subtitle">Four distinct classes of enemy, each with their own point value and animation cycle.</p>
+      <div class="aliens-showcase">
+
+        <!-- UFO -->
+        <article class="alien-card glass-card" data-points="300">
+          <div class="alien-display">
+            <div class="char-slot alien-big">
+              <svg class="v-retro" viewBox="0 0 48 24" fill="none">
+                <rect x="12" y="4"  width="24" height="4" fill="currentColor"/>
+                <rect x="4"  y="8"  width="40" height="4" fill="currentColor"/>
+                <rect x="0"  y="12" width="48" height="4" fill="currentColor"/>
+                <rect x="0"  y="16" width="8"  height="4" fill="currentColor"/>
+                <rect x="12" y="16" width="8"  height="4" fill="currentColor"/>
+                <rect x="28" y="16" width="8"  height="4" fill="currentColor"/>
+                <rect x="40" y="16" width="8"  height="4" fill="currentColor"/>
+              </svg>
+              <!-- 3D chrome saucer -->
+              <svg class="v-futuristic" viewBox="0 0 80 42" fill="none">
+                <ellipse cx="40" cy="30" rx="38" ry="12" fill="url(#ufo-3d-rim)" stroke="#00e5ff" stroke-width="1.2"/>
+                <ellipse cx="40" cy="26" rx="36" ry="8"  fill="rgba(0,220,255,0.12)"/>
+                <circle cx="10"  cy="30" r="3" fill="#00ffff" opacity="0.8"/>
+                <circle cx="21"  cy="25" r="3" fill="#00e5ff" opacity="0.7"/>
+                <circle cx="33"  cy="23" r="3" fill="#00ffff" opacity="0.8"/>
+                <circle cx="47"  cy="23" r="3" fill="#00e5ff" opacity="0.7"/>
+                <circle cx="59"  cy="25" r="3" fill="#00ffff" opacity="0.8"/>
+                <circle cx="70"  cy="30" r="3" fill="#00e5ff" opacity="0.7"/>
+                <path d="M22 30 Q22 10 40 10 Q58 10 58 30" fill="#0d3d52" stroke="#00e5ff" stroke-width="1"/>
+                <path d="M28 30 Q28 16 40 16 Q52 16 52 30" fill="rgba(0,180,220,0.15)"/>
+                <line x1="40" y1="10" x2="40" y2="3" stroke="#00e5ff" stroke-width="1.5"/>
+                <circle cx="40" cy="2" r="2.5" fill="#00ffff"/>
+              </svg>
+              <!-- ANIME cute saucer -->
+              <svg class="v-anime" viewBox="0 0 80 48" fill="none">
+                <text x="2"  y="20" font-size="12" fill="#ffaaff" opacity="0.8">✦</text>
+                <text x="66" y="18" font-size="12" fill="#ffb3ff" opacity="0.7">✦</text>
+                <text x="8"  y="40" font-size="8"  fill="#ff2dca" opacity="0.6">★</text>
+                <text x="64" y="42" font-size="8"  fill="#cc00ff" opacity="0.6">★</text>
+                <ellipse cx="40" cy="34" rx="36" ry="12" fill="url(#anime-ufo-body)" stroke="#ff2dca" stroke-width="1.5"/>
+                <ellipse cx="36" cy="30" rx="20" ry="6"  fill="rgba(255,255,255,0.18)"/>
+                <circle cx="12" cy="34" r="4" fill="#ffaaff" opacity="0.9"/>
+                <circle cx="24" cy="29" r="4" fill="#ff2dca" opacity="0.9"/>
+                <circle cx="40" cy="27" r="4" fill="#cc00ff" opacity="0.9"/>
+                <circle cx="56" cy="29" r="4" fill="#ff2dca" opacity="0.9"/>
+                <circle cx="68" cy="34" r="4" fill="#ffaaff" opacity="0.9"/>
+                <path d="M24 34 Q24 12 40 12 Q56 12 56 34" fill="rgba(180,0,255,0.55)" stroke="#ff2dca" stroke-width="1.5"/>
+                <circle cx="40" cy="24" r="8"  fill="#c084fc"/>
+                <circle cx="37" cy="23" r="2.5" fill="#2a0040"/>
+                <circle cx="43" cy="23" r="2.5" fill="#2a0040"/>
+                <circle cx="38" cy="22" r="1"   fill="white" opacity="0.8"/>
+                <circle cx="44" cy="22" r="1"   fill="white" opacity="0.8"/>
+                <path d="M37 27 Q40 30 43 27" stroke="#7e22ce" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <line x1="40" y1="12" x2="34" y2="4"  stroke="#ff2dca" stroke-width="2" stroke-linecap="round"/>
+                <line x1="40" y1="12" x2="46" y2="4"  stroke="#ff2dca" stroke-width="2" stroke-linecap="round"/>
+                <text x="30" y="6"  font-size="8" fill="#ff2dca">♥</text>
+                <text x="44" y="6"  font-size="8" fill="#ff2dca">♥</text>
+              </svg>
+            </div>
+          </div>
+          <div class="alien-info">
+            <h3 class="alien-name">Mystery Ship</h3>
+            <div class="alien-points">50–300 pts</div>
+            <p class="alien-desc">The elusive UFO that drifts across the top. Its bonus value is secretly determined by your current shot count — a hidden reward for skilled players.</p>
+          </div>
+        </article>
+
+        <!-- SQUID showcase -->
+        <article class="alien-card glass-card" data-points="30">
+          <div class="alien-display">
+            <div class="char-slot alien-big">
+              <svg class="v-retro" viewBox="0 0 32 24" fill="none">
+                <rect x="12" y="0" width="8" height="4" fill="currentColor"/>
+                <rect x="4"  y="4" width="24" height="4" fill="currentColor"/>
+                <rect x="0"  y="8" width="32" height="4" fill="currentColor"/>
+                <rect x="0"  y="12" width="4"  height="4" fill="currentColor"/><rect x="8"  y="12" width="4"  height="4" fill="currentColor"/>
+                <rect x="20" y="12" width="4"  height="4" fill="currentColor"/><rect x="28" y="12" width="4"  height="4" fill="currentColor"/>
+                <rect x="4"  y="16" width="24" height="4" fill="currentColor"/>
+                <rect x="4"  y="20" width="4"  height="4" fill="currentColor"/><rect x="24" y="20" width="4"  height="4" fill="currentColor"/>
+              </svg>
+              <svg class="v-futuristic" viewBox="0 0 68 66" fill="none">
+                <polygon points="0,26 6,18 6,42 0,38"   fill="#061828" stroke="#00e5ff" stroke-width="1"/>
+                <polygon points="68,26 62,18 62,42 68,38" fill="#061828" stroke="#00e5ff" stroke-width="1"/>
+                <polygon points="8,12 60,12 64,50 4,50"  fill="url(#mech-body)"/>
+                <polygon points="10,13 58,13 60,24 8,24" fill="rgba(0,220,255,0.1)"/>
+                <line x1="8" y1="28" x2="60" y2="28" stroke="rgba(0,200,255,0.25)" stroke-width="0.7"/>
+                <line x1="9" y1="38" x2="59" y2="38" stroke="rgba(0,200,255,0.25)" stroke-width="0.7"/>
+                <polygon points="8,12 60,12 64,50 4,50"  fill="none" stroke="#00e5ff" stroke-width="1.2"/>
+                <rect x="12" y="17" width="16" height="8" rx="2" fill="url(#mech-eye)"/>
+                <rect x="40" y="17" width="16" height="8" rx="2" fill="url(#mech-eye)"/>
+                <rect x="28" y="32" width="12" height="8" rx="2" fill="rgba(0,229,255,0.15)" stroke="#00e5ff" stroke-width="0.8"/>
+                <circle cx="11" cy="15" r="1.5" fill="#00e5ff" opacity="0.7"/>
+                <circle cx="57" cy="15" r="1.5" fill="#00e5ff" opacity="0.7"/>
+                <line x1="16" y1="50" x2="6"  y2="64" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="26" y1="50" x2="20" y2="64" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="42" y1="50" x2="48" y2="64" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="52" y1="50" x2="62" y2="64" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="6"  cy="64" r="2.5" fill="#00e5ff"/>
+                <circle cx="20" cy="64" r="2.5" fill="#00e5ff"/>
+                <circle cx="48" cy="64" r="2.5" fill="#00e5ff"/>
+                <circle cx="62" cy="64" r="2.5" fill="#00e5ff"/>
+                <line x1="34" y1="12" x2="34" y2="3" stroke="#00e5ff" stroke-width="1.5"/>
+                <circle cx="34" cy="2" r="3" fill="#00ffff"/>
+              </svg>
+              <svg class="v-anime" viewBox="0 0 68 76" fill="none">
+                <ellipse cx="34" cy="30" rx="24" ry="22" fill="#ff6bfe"/>
+                <path d="M22 10 Q14 2 10 0" stroke="#e040fb" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <circle cx="9"  cy="0" r="4" fill="#ffb3ff" stroke="#e040fb" stroke-width="1"/>
+                <path d="M46 10 Q54 2 58 0" stroke="#e040fb" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <circle cx="59" cy="0" r="4" fill="#ffb3ff" stroke="#e040fb" stroke-width="1"/>
+                <circle cx="23" cy="26" r="10" fill="white" stroke="#e040fb" stroke-width="1.5"/>
+                <circle cx="23" cy="27" r="6.5" fill="#2a0040"/>
+                <circle cx="26" cy="23" r="2.5" fill="white"/>
+                <circle cx="45" cy="26" r="10" fill="white" stroke="#e040fb" stroke-width="1.5"/>
+                <circle cx="45" cy="27" r="6.5" fill="#2a0040"/>
+                <circle cx="48" cy="23" r="2.5" fill="white"/>
+                <path d="M26 38 Q34 44 42 38" stroke="#c020b0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <ellipse cx="13" cy="34" rx="6" ry="4" fill="#ff8080" opacity="0.45"/>
+                <ellipse cx="55" cy="34" rx="6" ry="4" fill="#ff8080" opacity="0.45"/>
+                <ellipse cx="13" cy="55" rx="5.5" ry="9" fill="#e040fb"/>
+                <ellipse cx="23" cy="60" rx="5.5" ry="9" fill="#ff6bfe"/>
+                <ellipse cx="34" cy="62" rx="5.5" ry="9" fill="#e040fb"/>
+                <ellipse cx="45" cy="60" rx="5.5" ry="9" fill="#ff6bfe"/>
+                <ellipse cx="55" cy="55" rx="5.5" ry="9" fill="#e040fb"/>
+              </svg>
+            </div>
+          </div>
+          <div class="alien-info">
+            <h3 class="alien-name">Squid</h3>
+            <div class="alien-points">30 pts</div>
+            <p class="alien-desc">Found in the top row. The hardest to hit — but worth the most among the ground troops.</p>
+          </div>
+        </article>
+
+        <!-- CRAB showcase -->
+        <article class="alien-card glass-card" data-points="20">
+          <div class="alien-display">
+            <div class="char-slot alien-big">
+              <svg class="v-retro" viewBox="0 0 32 24" fill="none">
+                <rect x="4"  y="0"  width="4"  height="4" fill="currentColor"/><rect x="24" y="0"  width="4"  height="4" fill="currentColor"/>
+                <rect x="0"  y="4"  width="32" height="4" fill="currentColor"/>
+                <rect x="0"  y="8"  width="4"  height="4" fill="currentColor"/><rect x="8"  y="8"  width="4"  height="4" fill="currentColor"/>
+                <rect x="20" y="8"  width="4"  height="4" fill="currentColor"/><rect x="28" y="8"  width="4"  height="4" fill="currentColor"/>
+                <rect x="4"  y="12" width="24" height="4" fill="currentColor"/>
+                <rect x="8"  y="16" width="4"  height="4" fill="currentColor"/><rect x="20" y="16" width="4"  height="4" fill="currentColor"/>
+                <rect x="0"  y="20" width="8"  height="4" fill="currentColor"/><rect x="24" y="20" width="8"  height="4" fill="currentColor"/>
+              </svg>
+              <svg class="v-futuristic" viewBox="0 0 80 60" fill="none">
+                <polyline points="12,28 2,20 -4,28 2,36 12,32"   stroke="#00e5ff" stroke-width="2" stroke-linejoin="round" fill="#061828"/>
+                <polyline points="68,28 78,20 84,28 78,36 68,32" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round" fill="#061828"/>
+                <line x1="-4" y1="28" x2="-8" y2="23" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <line x1="-4" y1="28" x2="-8" y2="33" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <line x1="84" y1="28" x2="88" y2="23" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <line x1="84" y1="28" x2="88" y2="33" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <rect x="16" y="10" width="48" height="10" rx="3" fill="#0d3d52" stroke="#00e5ff" stroke-width="1"/>
+                <rect x="10" y="18" width="60" height="28" rx="5" fill="url(#mech-body)" stroke="#00e5ff" stroke-width="1.2"/>
+                <rect x="12" y="19" width="56" height="11" rx="3" fill="rgba(0,220,255,0.1)"/>
+                <rect x="16" y="23" width="48" height="14" rx="3" fill="#000d1a" stroke="#00e5ff" stroke-width="1"/>
+                <rect x="18" y="25" width="44" height="10" rx="2" fill="url(#mech-eye)"/>
+                <line x1="40" y1="24" x2="40" y2="37" stroke="rgba(0,10,20,0.7)" stroke-width="1.5"/>
+                <circle cx="14" cy="22" r="1.8" fill="#00e5ff" opacity="0.8"/>
+                <circle cx="66" cy="22" r="1.8" fill="#00e5ff" opacity="0.8"/>
+                <line x1="20" y1="46" x2="16" y2="56" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <line x1="32" y1="46" x2="30" y2="56" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <line x1="48" y1="46" x2="50" y2="56" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <line x1="60" y1="46" x2="64" y2="56" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="16" cy="56" r="2" fill="#00e5ff"/>
+                <circle cx="30" cy="56" r="2" fill="#00e5ff"/>
+                <circle cx="50" cy="56" r="2" fill="#00e5ff"/>
+                <circle cx="64" cy="56" r="2" fill="#00e5ff"/>
+              </svg>
+              <svg class="v-anime" viewBox="0 0 80 64" fill="none">
+                <circle cx="10" cy="28" r="12" fill="#e07030" stroke="#ff9550" stroke-width="1.5"/>
+                <circle cx="7"  cy="21" r="7"  fill="#ff9550"/>
+                <circle cx="7"  cy="35" r="7"  fill="#ff9550"/>
+                <circle cx="70" cy="28" r="12" fill="#e07030" stroke="#ff9550" stroke-width="1.5"/>
+                <circle cx="73" cy="21" r="7"  fill="#ff9550"/>
+                <circle cx="73" cy="35" r="7"  fill="#ff9550"/>
+                <ellipse cx="40" cy="32" rx="22" ry="20" fill="#ff9550"/>
+                <line x1="30" y1="14" x2="26" y2="7" stroke="#ff9550" stroke-width="4" stroke-linecap="round"/>
+                <line x1="50" y1="14" x2="54" y2="7" stroke="#ff9550" stroke-width="4" stroke-linecap="round"/>
+                <circle cx="25" cy="6"  r="8"  fill="white" stroke="#e07030" stroke-width="1.5"/>
+                <circle cx="25" cy="7"  r="5"  fill="#2a0040"/>
+                <circle cx="27" cy="4"  r="2"  fill="white"/>
+                <circle cx="55" cy="6"  r="8"  fill="white" stroke="#e07030" stroke-width="1.5"/>
+                <circle cx="55" cy="7"  r="5"  fill="#2a0040"/>
+                <circle cx="57" cy="4"  r="2"  fill="white"/>
+                <path d="M30 38 Q40 46 50 38" stroke="#c05020" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <ellipse cx="24" cy="34" rx="6" ry="4" fill="#ff8080" opacity="0.4"/>
+                <ellipse cx="56" cy="34" rx="6" ry="4" fill="#ff8080" opacity="0.4"/>
+                <ellipse cx="26" cy="52" rx="5" ry="7" fill="#e07030"/>
+                <ellipse cx="36" cy="55" rx="5" ry="7" fill="#e07030"/>
+                <ellipse cx="44" cy="55" rx="5" ry="7" fill="#e07030"/>
+                <ellipse cx="54" cy="52" rx="5" ry="7" fill="#e07030"/>
+              </svg>
+            </div>
+          </div>
+          <div class="alien-info">
+            <h3 class="alien-name">Crab</h3>
+            <div class="alien-points">20 pts</div>
+            <p class="alien-desc">The middle rows. Fast enough to be dangerous, present in large enough numbers to create real pressure.</p>
+          </div>
+        </article>
+
+        <!-- OCTOPUS showcase -->
+        <article class="alien-card glass-card" data-points="10">
+          <div class="alien-display">
+            <div class="char-slot alien-big">
+              <svg class="v-retro" viewBox="0 0 32 24" fill="none">
+                <rect x="8"  y="0"  width="16" height="4" fill="currentColor"/>
+                <rect x="4"  y="4"  width="24" height="4" fill="currentColor"/>
+                <rect x="0"  y="8"  width="32" height="4" fill="currentColor"/>
+                <rect x="0"  y="12" width="8"  height="4" fill="currentColor"/><rect x="12" y="12" width="8"  height="4" fill="currentColor"/>
+                <rect x="24" y="12" width="8"  height="4" fill="currentColor"/>
+                <rect x="0"  y="16" width="32" height="4" fill="currentColor"/>
+                <rect x="4"  y="20" width="4"  height="4" fill="currentColor"/><rect x="12" y="20" width="8"  height="4" fill="currentColor"/>
+                <rect x="24" y="20" width="4"  height="4" fill="currentColor"/>
+              </svg>
+              <svg class="v-futuristic" viewBox="0 0 72 70" fill="none">
+                <line x1="36" y1="24" x2="10" y2="8"  stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <line x1="36" y1="24" x2="4"  y2="28" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <line x1="36" y1="30" x2="4"  y2="42" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <line x1="36" y1="34" x2="12" y2="54" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <line x1="36" y1="34" x2="60" y2="54" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <line x1="36" y1="30" x2="68" y2="42" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <line x1="36" y1="24" x2="68" y2="28" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <line x1="36" y1="24" x2="62" y2="8"  stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="10" cy="8"  r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+                <circle cx="4"  cy="28" r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+                <circle cx="4"  cy="42" r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+                <circle cx="12" cy="54" r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+                <circle cx="60" cy="54" r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+                <circle cx="68" cy="42" r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+                <circle cx="68" cy="28" r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+                <circle cx="62" cy="8"  r="3" fill="#00e5ff" stroke="#030b18" stroke-width="1"/>
+                <ellipse cx="36" cy="28" rx="26" ry="20" fill="url(#mech-body)" stroke="#00e5ff" stroke-width="1.2"/>
+                <ellipse cx="36" cy="22" rx="18" ry="10" fill="rgba(0,220,255,0.1)"/>
+                <circle cx="36" cy="28" r="13" fill="#000d1a" stroke="#00e5ff" stroke-width="1.5"/>
+                <circle cx="36" cy="28" r="8"  fill="url(#mech-eye)"/>
+                <circle cx="36" cy="28" r="4"  fill="#000a14"/>
+                <circle cx="40" cy="24" r="2.5" fill="white" opacity="0.6"/>
+                <circle cx="36" cy="28" r="13" fill="none" stroke="rgba(0,200,255,0.3)" stroke-width="0.8" stroke-dasharray="4 3"/>
+              </svg>
+              <svg class="v-anime" viewBox="0 0 72 76" fill="none">
+                <polygon points="28,4 36,10 28,16" fill="#ff2dca"/>
+                <polygon points="44,4 36,10 44,16" fill="#ff2dca"/>
+                <circle cx="36" cy="10" r="4" fill="#ff6bfe"/>
+                <circle cx="36" cy="30" r="24" fill="#a855f7"/>
+                <circle cx="26" cy="26" r="10" fill="white" stroke="#7e22ce" stroke-width="1.5"/>
+                <circle cx="26" cy="27" r="6.5" fill="#2a0040"/>
+                <circle cx="29" cy="23" r="2.5" fill="white"/>
+                <circle cx="28" cy="22" r="1.2" fill="white" opacity="0.8"/>
+                <circle cx="46" cy="26" r="10" fill="white" stroke="#7e22ce" stroke-width="1.5"/>
+                <circle cx="46" cy="27" r="6.5" fill="#2a0040"/>
+                <circle cx="49" cy="23" r="2.5" fill="white"/>
+                <circle cx="48" cy="22" r="1.2" fill="white" opacity="0.8"/>
+                <path d="M22 38 Q36 48 50 38" stroke="#7e22ce" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <ellipse cx="14" cy="34" rx="7" ry="5" fill="#ff80ff" opacity="0.4"/>
+                <ellipse cx="58" cy="34" rx="7" ry="5" fill="#ff80ff" opacity="0.4"/>
+                <path d="M16 50 Q10 60 16 68" stroke="#7e22ce" stroke-width="5" fill="none" stroke-linecap="round"/>
+                <path d="M22 52 Q18 62 22 70" stroke="#9333ea" stroke-width="5" fill="none" stroke-linecap="round"/>
+                <path d="M29 54 Q27 64 30 72" stroke="#7e22ce" stroke-width="5" fill="none" stroke-linecap="round"/>
+                <path d="M36 54 Q36 64 36 72" stroke="#9333ea" stroke-width="5" fill="none" stroke-linecap="round"/>
+                <path d="M43 54 Q45 64 42 72" stroke="#7e22ce" stroke-width="5" fill="none" stroke-linecap="round"/>
+                <path d="M50 52 Q54 62 50 70" stroke="#9333ea" stroke-width="5" fill="none" stroke-linecap="round"/>
+                <path d="M56 50 Q62 60 56 68" stroke="#7e22ce" stroke-width="5" fill="none" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="alien-info">
+            <h3 class="alien-name">Octopus</h3>
+            <div class="alien-points">10 pts</div>
+            <p class="alien-desc">The bottom rows and most numerous. Shoot them first to slow the advance — or take risks targeting higher-value enemies.</p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================  LEGACY  ============================================================ -->
+  <section class="section section-legacy" id="legacy" aria-labelledby="legacy-heading">
+    <div class="section-inner">
+      <div class="section-label">// CHAPTER 04</div>
+      <h2 class="section-title" id="legacy-heading">The Legacy</h2>
+      <div class="stats-grid">
+        <div class="stat-card glass-card"><div class="stat-number" data-target="2">0</div><div class="stat-unit">billion $</div><div class="stat-label">Revenue in first year</div></div>
+        <div class="stat-card glass-card"><div class="stat-number" data-target="100">0</div><div class="stat-unit">K+ units</div><div class="stat-label">Arcade cabinets sold</div></div>
+        <div class="stat-card glass-card"><div class="stat-number" data-target="1978">0</div><div class="stat-unit">Year</div><div class="stat-label">The year it all began</div></div>
+        <div class="stat-card glass-card"><div class="stat-number" data-target="30">0</div><div class="stat-unit">+</div><div class="stat-label">Official platform ports</div></div>
+      </div>
+      <blockquote class="legacy-quote glass-card">
+        <p>"I had to design the hardware first, then the software. It was like building a race track and a car at the same time."</p>
+        <footer>— <cite>Tomohiro Nishikado, Creator of Space Invaders</cite></footer>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- ============================================================  CTA  ============================================================ -->
+  <section class="section section-cta" aria-labelledby="cta-heading">
+    <div class="section-inner section-inner--centered">
+      <h2 class="cta-title" id="cta-heading">
+        <span class="cta-title-line">DEFEND</span>
+        <span class="cta-title-line cta-title-accent">EARTH.</span>
+      </h2>
+      <p class="cta-subtitle">Join millions of players who answered the call. The invasion never stops — neither should you.</p>
+      <div class="cta-buttons">
+        <a href="#gameplay" class="btn btn-primary btn-large"><span class="btn-text">START GAME</span><span class="btn-glow" aria-hidden="true"></span></a>
+        <a href="#aliens"   class="btn btn-secondary btn-large">VIEW ENEMIES</a>
+      </div>
+      <div class="cta-ticker" aria-hidden="true">
+        <div class="ticker-track">
+          <span>HIGH SCORE: 9990 &nbsp;•&nbsp; PLAYER 1 UP &nbsp;•&nbsp; INSERT COIN &nbsp;•&nbsp; GAME OVER &nbsp;•&nbsp; HIGH SCORE: 9990 &nbsp;•&nbsp; PLAYER 1 UP &nbsp;•&nbsp; INSERT COIN &nbsp;•&nbsp; GAME OVER &nbsp;•&nbsp;</span>
+          <span>HIGH SCORE: 9990 &nbsp;•&nbsp; PLAYER 1 UP &nbsp;•&nbsp; INSERT COIN &nbsp;•&nbsp; GAME OVER &nbsp;•&nbsp; HIGH SCORE: 9990 &nbsp;•&nbsp; PLAYER 1 UP &nbsp;•&nbsp; INSERT COIN &nbsp;•&nbsp; GAME OVER &nbsp;•&nbsp;</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================  FOOTER  ============================================================ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <svg class="footer-logo-svg" viewBox="0 0 44 32" fill="none" aria-hidden="true">
+          <rect x="4"  y="0"  width="4" height="4" fill="currentColor" opacity="0.7"/><rect x="36" y="0"  width="4" height="4" fill="currentColor" opacity="0.7"/>
+          <rect x="8"  y="4"  width="4" height="4" fill="currentColor" opacity="0.7"/><rect x="32" y="4"  width="4" height="4" fill="currentColor" opacity="0.7"/>
+          <rect x="4"  y="8"  width="36" height="4" fill="currentColor" opacity="0.7"/>
+          <rect x="0"  y="12" width="4" height="4" fill="currentColor" opacity="0.7"/><rect x="8"  y="12" width="4" height="4" fill="currentColor" opacity="0.7"/>
+          <rect x="20" y="12" width="4" height="4" fill="currentColor" opacity="0.7"/><rect x="32" y="12" width="4" height="4" fill="currentColor" opacity="0.7"/>
+          <rect x="40" y="12" width="4" height="4" fill="currentColor" opacity="0.7"/>
+          <rect x="0"  y="16" width="44" height="4" fill="currentColor" opacity="0.7"/>
+          <rect x="0"  y="20" width="4" height="4" fill="currentColor" opacity="0.7"/><rect x="40" y="20" width="4" height="4" fill="currentColor" opacity="0.7"/>
+          <rect x="8"  y="24" width="4" height="4" fill="currentColor" opacity="0.7"/><rect x="32" y="24" width="4" height="4" fill="currentColor" opacity="0.7"/>
+        </svg>
+        <p class="footer-brand-name">SPACE INVADERS</p>
+        <p class="footer-brand-sub">Originally created by Tomohiro Nishikado, 1978</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <ul role="list">
+          <li><a href="#story">Origin</a></li>
+          <li><a href="#gameplay">Gameplay</a></li>
+          <li><a href="#aliens">Enemies</a></li>
+          <li><a href="#legacy">Legacy</a></li>
+        </ul>
+      </nav>
+      <div class="footer-themes">
+        <p>Switch Theme:</p>
+        <div class="footer-theme-btns">
+          <button class="footer-theme-btn" data-theme-target="retro"      title="Retro">🎮</button>
+          <button class="footer-theme-btn" data-theme-target="futuristic" title="Futuristic">🧊</button>
+          <button class="footer-theme-btn" data-theme-target="anime"      title="Anime">🌸</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 Space Invaders Landing Page. Built as a frontend demonstration. Space Invaders® is a trademark of Taito Corporation.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
